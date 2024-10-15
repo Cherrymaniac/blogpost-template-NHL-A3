@@ -100,19 +100,32 @@ Nous commençons par comparer la fréquence des différents types de tirs, en vi
 
 !["Nombre de tirs et de buts par type de tir"](/assets/images/Bar_typetirbut.jpg)
 Le graphe ne nous aide pas vraiment à cause de la disparité dans les valeurs des données tirs/buts, nous representons donc ça en changeant l'échelle de l'axe des ordonnées en logarithmique, nous ajoutons également un graphe représentant les pourcentages sur l'axe des ordonnées opposées:
-<!-- !["Sous figure ombre de tirs et de buts par type de tir"](/assets/images/Sousfigure_Bartypetirbut.jpg)"""-->
-!["Nombre de tirs et de buts par type de tir (Log) et pourcentage"](/assets/images/Log_bar_typetirbut.jpg)
+!["Nombre de tirs et de buts par type de tir (Log) et pourcentage"](/assets/images/shottypelog.png)
 De ce graphe, nous observons:
 * `Tir le plus dangereux` : Le tir cradle a le pourcentage de réussite le plus élevé, bien qu'il soit le moins utilisé.
 
 * `Tir le plus commun` : Le tir du poignet est de loin le plus courant, comme le montre le nombre d'essais par rapport aux autres types de tirs. Cependant, son pourcentage de réussite n'est pas aussi élevé que celui d'autres tirs moins courants, comme le bat ou le tip in.
 
 ## Analyse de la Relation entre la Distance des Tirs et les Chances de But
+Nous avons choisi de répondre à la question 2 à l'aide d'un graphique en courbes avec la distance en abscisse et le taux de probabilité de but en ordonnée. Nous avons également décidé de tracer les trois saisons sur le même graphique pour mieux observer les variations entre elles. Cela montre clairement qu'il existe une relation inverse entre la distance et le taux de réussite d'un but. Plus un tir est proche du but, moins le gardien a de temps pour réagir, ce qui augmente la probabilité de marquer.
 !["Taux de Buts en Fonction de la Distance au But par Saison (2018-2021)"](/assets/images/Tauxdebutdistance.jpg)
-
+De ce graphe, nous observons:
+* Le taux de probabilité de marquer un but selon la distance est stable par saison.
+* Une augmentation du taux de but à la distance [80,90] à la saison 2020-2021.
 
 ## Visualisation du Pourcentage de Buts en Fonction de la Distance et des Types de Tirs
-![" Pourcentage de Buts en Fonction de la Distance et des Types de Tirs"](/assets/images/Heatmap_but_distance.jpg)
-
+Pour répondre à cette question; nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite de marquage d'un but par une heatmap.
+![" Pourcentage de Buts en Fonction de la Distance et des Types de Tirs"](/assets/images/Heatmap_final.png)
+Nous pouvons observer:
+* Le cradle est le type de tir le plus dangereux entre [0,10], le tir bat est second.
+* De 0 à 30, les tirs snaps et slaps sont les plus dangereux.
+* A une distance de 40 à 50, le poke est le plus dangereux avec taux de réussite de 40%.
 # Visualisations Complexes
+    
+## Analyse de l’équipe Colorado Avalanche, comparaison des cartes de tirs entre 2016-2017 et 2020-2021
+Lors de la saison 2016-2017, l'équipe de Colorado Avalanche affiche un taux de tirs relativement faible devant le filet (à 10-20 pieds du but) comparé à la moyenne de la ligue à la même position. En revanche, pendant la saison 2020-2021, on observe une augmentation du taux de tirs près du filet, ce qui pourrait expliquer leur montée dans le classement entre 2016 et 2020.
+
+## Comparaison entre Buffalo Sabres et Tampa Bay Lightning, basée sur leurs cartes de tirs
+
+
 
