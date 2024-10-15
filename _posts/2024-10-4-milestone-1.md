@@ -6,12 +6,19 @@ categories: Blog IFT6758_A3
 
 # Question 1 : Acquisition de données
 
-Nous allons explorer la classe `NHLDataDownloader`, son constructeur et les méthodes associées à l'acquisition de données. 
+Dans cette section, nous détaillons le fonctionnement de la classe NHLDataDownloader qui gère l'acquisition des données brutes depuis l'API de la NHL. Elle se compose de trois parties principales : l'initialisation, la récupération des données, et le traitement des données.
+
 ## Initialisation de la classe
-Nous commençons par construire un objet NHLDataDownloader. Dans le constructeur __init__ nous définissons les attributs suivants:
-* start_season et final_season définissent la plage de saisons à extraire.
-* data_dir spécifie où stocker les fichiers de données.
-* Les chemins de fichiers pour les données de jeu, les données des joueurs et les événements de tir sont définis à partir de datadir .
+L'initialisation de la classe `NHLDataDownloader` se fait à l'aide de trois arguments :
+
+* start_season et final_season : Ces paramètres définissent la plage des saisons NHL à récupérer (par exemple, de 2016 à 2023).
+* data_dir (facultatif) : Ce paramètre permet de spécifier le répertoire de sauvegarde des données. Si aucun répertoire n'est fourni, le répertoire courant est utilisé par défaut.
+
+Les fichiers clés sont générés automatiquement dans le répertoire choisi :
+
+1.  nhl_game_data.json : Contient les données brutes des matchs.
+2.  nhl_player_data.json : Contient les noms des joueurs associés à leurs ID.
+3.  parsed_shot_events.csv : Contient les données traitées relatives aux tirs.
 
 ```python
 class NHLDataDownloader:
@@ -24,7 +31,13 @@ class NHLDataDownloader:
         self.parsed_data_path = os.path.join(self.data_dir, 'parsed_shot_events.csv')
 ```
 ## Récupération des données de jeu de la NHL
-Dans la méthode 'get_nhl_game_data', nous avons crée une boucle qui traverse chaque saison et chaque jeu donnée à la construction de NHLDataDownloader. On construit l'URL de l'API pour chaque jeu et on récupère les données de jeu pour les stocker dans le dictionnaire `all_data`.
+La méthode `get_nhl_game_data` permet de récupérer les données de jeu directement depuis l'API de la NHL. Cette méthode effectue les étapes suivantes :
+
+1. Construction de l'identifiant de match : Chaque match NHL est identifié par un `gameId`, qui est utilisé pour faire des requêtes à l'API de la NHL. Ce `gameId` est basé sur l'année de la saison et un numéro de match.
+2. Requête à l'API : Pour chaque match, une requête HTTP est envoyée à l'API de la NHL pour récupérer les événements du match.
+3. Sauvegarde des données brutes : Les données sont stockées dans un dictionnaire local nommé `all_data`, puis sauvegardées dans un fichier JSON (`nhl_game_data.json`) pour être utilisées lors des étapes ultérieures de traitement des données.
+
+ `all_data`.
 ```python 
 def get_nhl_game_data(self):
     all_data = {}
@@ -38,18 +51,25 @@ def get_nhl_game_data(self):
             all_data[game_id] = game_data
 ```
 
-
+Cette méthode prend également en compte (en plus des parties de saison régulière) les parties des séries éliminatoires. Cette approche permet d'acquérir une grande quantité de données pour les saisons spécifiées, couvrant ainsi tous les matchs joués au cours de ces saisons. Bref, la classe `NHLDataDownloader` permet d'automatiser la récupération de données depuis l'API de la NHL, et de structurer ces données en vue de leur traitement et analyse future.
 
 # Outil de débogage interactif: Outil piwydget
 
 
 # Nettoyage des données 
-Maintenant que vous avez obtenu et exploré un peu les données, nous devons formater les données de manière à faciliter l’analyse.
-Dans la méthode 'parse_nhl_game_data', on:
-* Lit les données de jeu stockées.
-* Filtre les événements de tir (types d'événements 505 et 506).
-* Extrait les détails pertinents pour chaque tir.
-* Combine tous les événements de tir dans un seul DataFrame.
+Le traitement des données brutes est un aspect essentiel de l’analyse, et cela se fait dans la méthode `parse_nhl_game_data` de la classe `NHLDataDownloader`. Voici les étapes principales que cette méthode suit pour extraire et organiser les données relatives aux tirs dans les matchs de la NHL :
+
+
+
+* Chargement des données de jeu : La méthode commence par vérifier si un fichier CSV contenant les événements de tir a déjà été généré. Si c’est le cas, ce fichier est chargé pour éviter de retraiter les mêmes données. Sinon, elle procède à l'extraction des données à partir du fichier JSON qui contient les données brutes des matchs, précédemment sauvegardé par la méthode `get_nhl_game_data`.
+
+* Filtrage des événements de tir : À partir des données brutes de chaque match, la méthode parcourt chaque événement (play) pour identifier ceux liés aux tirs, c’est-à-dire les événements de type 505 (but) et 506 (tir raté). Une fois identifiés, ces événements sont filtrés et les détails importants, comme l'identité du tireur, du gardien, le type de tir, et la situation du jeu, sont extraits.
+
+* Gestion des données des joueurs : Pour enrichir les données des événements, la méthode fait appel à `get_player_name` qui associe les identifiants des joueurs (ID) à leurs noms complets. Cette méthode appelle l'API de la NHL pour récupérer les noms des joueurs à partir de leur ID si ceux-ci ne sont pas déjà stockés dans un fichier local (`nhl_player_data.json`). Une fois le nom récupéré, il est ajouté au dictionnaire des joueurs pour des requêtes futures plus rapides qui a pour but d'éviter les requêtes redondantes à l'API. 
+
+* Création d’un DataFrame : Pour chaque match, les événements de tir sont stockés dans une liste. À la fin de l'extraction des tirs pour un match, cette liste est convertie en un DataFrame Pandas. Ces DataFrames individuels sont ensuite concaténés en un seul DataFrame global qui regroupe tous les tirs des saisons spécifiées.
+
+* Sauvegarde des données traitées : Une fois que tous les événements de tir sont extraits et organisés dans le DataFrame, les données sont sauvegardées dans un fichier CSV pour éviter de répéter le traitement lors des exécutions futures.
 
 ``` python
 def parse_nhl_game_data(self):
@@ -68,6 +88,8 @@ def parse_nhl_game_data(self):
             shot_events_df = pd.DataFrame(shot_events)
             all_shot_events_df = pd.concat([all_shot_events_df, shot_events_df], ignore_index=True)
 ```
+
+Grâce à ce processus, les données brutes de la NHL sont transformées en un format plus exploitable, permettant ainsi une analyse plus approfondie, comme l'exploration des tirs et des buts par type ou la comparaison de la performance des joueurs.
 
 
 # Visualisations Simples
