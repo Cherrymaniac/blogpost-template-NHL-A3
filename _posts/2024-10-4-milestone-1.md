@@ -5,6 +5,17 @@ categories: Blog IFT6758_A3
 ---
 
 Edward Habelrih, Michel Wilfred Essono et Rayan Yahiaoui
+
+# Procédure de roulement des notebooks
+Veuillez rouler les notebooks du fichier `/notebooks` dans l'ordre suivant. Assurez-vous d'installer tous les modules des fichiers `requirements.txt` et `environment.yml`. Il se peut que vous ayez à en installer d'autres en roulant les notebooks, ceci est correct. 
+
+
+1. `Acquisition_Traitement_Donnees.ipynb`
+2. `Interactive_Widget.ipynb`
+3. `Visualisations_Simples.ipynb`
+4. `Visualisations_Complexes.ipynb`
+
+
 # Question 1 : Acquisition de données
 
 Dans cette section, nous expliquons comment utiliser la classe `NHLDataDownloader` du fichier `data_acquisisiton.py` pour gérer l'acquisistion des données brutes depuis l'API de la NHL. Ce processus se compose de trois parties principales: l'initialisation, la récupération des données, et le traitement des données. Nous allons élaborer d'avantage sur cette troisième étape dans la troisième section du blog. 
