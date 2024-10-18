@@ -223,36 +223,86 @@ En résume, ce code permet de naviguer et d'afficher les informations d'un match
 Le traitement des données brutes est un aspect essentiel de l’analyse, et cela se fait dans la méthode `parse_nhl_game_data` de la classe `NHLDataDownloader`. Voici les étapes principales que cette méthode suit pour extraire et organiser les données relatives aux tirs dans les matchs de la NHL :
 
 
+1. Vérification de l'existence des données traitées:
+    * Avant de retraiter les données, la méthode vérifie si un fichier CSV contenant les évènements de tir a déjà été généré. Si ce fichier existe (`parsed_shot_events.csv`), il est directement chargé via `pd.read_csv()` pour éviter un retraitement iniutile des mêmes données.
 
-* Chargement des données de jeu : La méthode commence par vérifier si un fichier CSV contenant les événements de tir a déjà été généré. Si c’est le cas, ce fichier est chargé pour éviter de retraiter les mêmes données. Sinon, elle procède à l'extraction des données à partir du fichier JSON qui contient les données brutes des matchs, précédemment sauvegardé par la méthode `get_nhl_game_data`.
+2. Chargement des donées brutes:
+    * Si les données n'ont pas encore été traitées, elles sont chargées depuis un fichier JSON (`nhl_game_data.json`), qui contient les détails bruts des matchs de la NHL. Ces données comprennent tous les évènements survenus lors des matchs.
 
-* Filtrage des événements de tir : À partir des données brutes de chaque match, la méthode parcourt chaque événement (play) pour identifier ceux liés aux tirs, c’est-à-dire les événements de type 505 (but) et 506 (tir raté). Une fois identifiés, ces événements sont filtrés et les détails importants, comme l'identité du tireur, du gardien, le type de tir, et la situation du jeu, sont extraits.
+3. Filtrage des évènements liés aux tirs
+    * La méthode parcourt les évènements de chaque match en identifiant ceux liés aux tirs (types 505 pour les buts et 506 pour les shots on goal). Pour chaque tir, les détails importants, tels que l'identité du tireur, du gardien, la période du match, le type de tir, la situation de jeu (comme les avantages numériques), et les coordonnées dur tir sur la patinoire sont extraits et stockés dans un dictionnaire.
 
-* Gestion des données des joueurs : Pour enrichir les données des événements, la méthode fait appel à `get_player_name` qui associe les identifiants des joueurs (ID) à leurs noms complets. Cette méthode appelle l'API de la NHL pour récupérer les noms des joueurs à partir de leur ID si ceux-ci ne sont pas déjà stockés dans un fichier local (`nhl_player_data.json`). Une fois le nom récupéré, il est ajouté au dictionnaire des joueurs pour des requêtes futures plus rapides qui a pour but d'éviter les requêtes redondantes à l'API. 
+4. Gestion des données des joueurs
+    * Pour enrichir les données, les identifiants des joueurs (tireurs et gardiens) sont convertis en noms complets via la fonction `get_player_name()`. Cette fonction comme dans la section précédente, évite les appels redondants à l'API de la NHL en vérifiant si le nom du joueur a déjà été récupéré ou est stocké localement dans un fichier JSON (`nhl_player_data.json`)
 
-* Création d’un DataFrame : Pour chaque match, les événements de tir sont stockés dans une liste. À la fin de l'extraction des tirs pour un match, cette liste est convertie en un DataFrame Pandas. Ces DataFrames individuels sont ensuite concaténés en un seul DataFrame global qui regroupe tous les tirs des saisons spécifiées.
+5. Création d'un DataFrame Pandas:
+    * Une liste d'évènements de tir est accumulée pour chaque match. Cest évènements sont ensuite convertis en un DataFrame Pandas individuel pour chaque match. Ces DataFrames sont concaténés en un seul DataFrame global (`all_shot_events_df`), qui contient les évènements de tir de tous les matchs analysés.
 
-* Sauvegarde des données traitées : Une fois que tous les événements de tir sont extraits et organisés dans le DataFrame, les données sont sauvegardées dans un fichier CSV pour éviter de répéter le traitement lors des exécutions futures.
+6. Sauvegarde des données traitées:
+    * Une fois tous les évènements extraits et organisés dans le DataFrame, les données sont sauvegardées dans un fichier CSV (`parsed_shot_events.csv`). Cela Permet d'éviter de refaire le traitement lors des exécutions futures.
 
 ``` python
-def parse_nhl_game_data(self):
-    all_shot_events_df = pd.DataFrame()
-    with open(self.nhl_games_file_path, 'r') as json_file:
-        game_data = json.load(json_file)
-    for game_id, game_details in game_data.items():
-        all_plays = game_details.get('plays', [])
-        shot_events = []
-        for play in all_plays:
-            event_type = play.get('typeCode')
-            if event_type in [505, 506]:
-                # ... (code to extract shot details)
-                shot_events.append(shot_details)
-        if shot_events:
-            shot_events_df = pd.DataFrame(shot_events)
-            all_shot_events_df = pd.concat([all_shot_events_df, shot_events_df], ignore_index=True)
+    def parse_nhl_game_data(self):
+        """
+        Parses the NHL game data from a JSON file and filters for shot-related events.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing shot-related events for all games.
+        """
+
+        if os.path.exists(self.parsed_data_path):
+            print(f"Loading parsed data from {self.parsed_data_path}...")
+            return pd.read_csv(self.parsed_data_path)
+        
+        all_shot_events_df = pd.DataFrame()
+        
+        with open(self.nhl_games_file_path, 'r') as json_file:
+            game_data = json.load(json_file)
+
+        # Parsing data
+        for game_id, game_details in game_data.items():
+            print(f"Parsing game {game_id}")
+            all_plays = game_details.get('plays', [])
+            shot_events = []
+
+            for play in all_plays:
+                event_type = play.get('typeCode')
+                if event_type in [505, 506]:
+                    shooter_id = play.get('details', {}).get('scoringPlayerId') if event_type == 505 else play.get('details', {}).get('shootingPlayerId')
+                    goalie_id = play.get('details', {}).get('goalieInNetId')
+                    situation_code = play.get('situationCode')
+                    shot_details = {
+                        'season': game_details.get('season'),
+                        'gameId': game_id,
+                        'eventId': play.get('eventId'),
+                        'period': play.get('periodDescriptor', {}).get('number'),
+                        'timeInPeriod': play.get('timeInPeriod'),
+                        'eventType': play.get('typeDescKey'),
+                        'teamId': play.get('details', {}).get('eventOwnerTeamId'),
+                        'shooter': self.get_player_name(shooter_id),
+                        'goalie': self.get_player_name(goalie_id),
+                        'shotType': play.get('details', {}).get('shotType'),
+                        'emptyNetAway': False if int(situation_code[0]) == 1 else True,
+                        'emptyNetHome': False if int(situation_code[3]) == 1 else True,
+                        'powerplayHome': True if int(situation_code[2]) > int(situation_code[1]) else False,
+                        'powerplayAway': True if int(situation_code[1]) > int(situation_code[2]) else False,
+                        'coordinates': (play.get('details', {}).get('xCoord'), play.get('details', {}).get('yCoord')),
+                        'result': 'goal' if event_type == 505 else 'no goal'
+                    }
+                    shot_events.append(shot_details)
+
+            if shot_events:
+                shot_events_df = pd.DataFrame(shot_events)
+                all_shot_events_df = pd.concat([all_shot_events_df, shot_events_df], ignore_index=True)
+
+        all_shot_events_df.to_csv(self.parsed_data_path, index=False)
+        print(f"Parsed data saved to {self.parsed_data_path}")
+        return all_shot_events_df
 ```
 
-Grâce à ce processus, les données brutes de la NHL sont transformées en un format plus exploitable, permettant ainsi une analyse plus approfondie, comme l'exploration des tirs et des buts par type ou la comparaison de la performance des joueurs.
+Il est important de noter que la méthode prend en compte diverses situations de jeu, comme les tirs en avantage numérique et les buts dans des cages vides, ce qui permet de fournir des informations contextuelles précises pour chaque évènement. Les coordonnées des tirs sont également extraites, ce qui peut être utilisé pour des anlayses spatiales, comme des cartes de tirs qui vont être présentées dans les prochaines sections. 
+
+Bref, grâce à ce processus, les données brutes de la NHL sont transformées en un format plus exploitable, permettant ainsi une analyse plus approfondie, comme l'exploration des tirs et des buts par type ou la comparaison de la performance des joueurs.
 
 
 # Visualisations Simples
