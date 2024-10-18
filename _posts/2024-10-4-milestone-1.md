@@ -4,45 +4,68 @@ title: Milestone 1
 categories: Blog IFT6758_A3
 ---
 
+Edward Habelrih, Michel Wilfred Essono et Rayan Yahiaoui
 # Question 1 : Acquisition de données
 
-Dans cette section, nous détaillons le fonctionnement de la classe NHLDataDownloader qui gère l'acquisition des données brutes depuis l'API de la NHL. Elle se compose de trois parties principales : l'initialisation, la récupération des données, et le traitement des données.
+Dans cette section, nous expliquons comment utiliser la classe `NHLDataDownloader` du fichier `data_acquisisiton.py` pour gérer l'acquisistion des données brutes depuis l'API de la NHL. Ce processus se compose de trois parties principales: l'initialisation, la récupération des données, et le traitement des données. Nous allons élaborer d'avantage sur cette troisième étape dans la troisième section du blog. 
 
 ## Initialisation de la classe
-L'initialisation de la classe `NHLDataDownloader` se fait à l'aide de trois arguments :
+L'initialisation de la classe `NHLDataDownloader` nécessite trois arguments:
 
-* start_season et final_season : Ces paramètres définissent la plage des saisons NHL à récupérer (par exemple, de 2016 à 2023).
-* data_dir (facultatif) : Ce paramètre permet de spécifier le répertoire de sauvegarde des données. Si aucun répertoire n'est fourni, le répertoire courant est utilisé par défaut.
+* `start_season` et `final_season` : Ces paramètres définissent la plage des saisons NHL à récupérer (par exemple, de 2016 à 2023).
+* `data_dir` (facultatif) : Ce paramètre permet de spécifier le répertoire de sauvegarde des données. Si aucun répertoire n'est fourni, le répertoire `data` est utilisé par défaut.
 
-Les fichiers clés sont générés automatiquement dans le répertoire choisi :
+Les fichiers générés dans le répertoire choisi contiennent les données brutes et traitées des matchs de la NHL. Voici les fichiers clés:
 
-1.  nhl_game_data.json : Contient les données brutes des matchs.
-2.  nhl_player_data.json : Contient les noms des joueurs associés à leurs ID.
-3.  parsed_shot_events.csv : Contient les données traitées relatives aux tirs.
+1.  **nhl_game_data.json** : Contient les données brutes des matchs.
+2.  **nhl_player_data.json** : Contient les noms des joueurs associés à leurs ID.
+3.  **parsed_shot_events.csv** : Contient les données traitées relatives aux tirs.
 
+Exemple d'initialisation:
 ```python
 class NHLDataDownloader:
     def __init__(self, start_season, final_season, data_dir=None):
         self.start_season = start_season
         self.final_season = final_season
-        self.data_dir = data_dir if data_dir else os.getcwd()
+        
+        #Points to the data folder
+        root_directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
+        self.data_dir = data_dir if data_dir else os.path.join(root_directory, 'data')
+
+        #Create directory if it doesn't already exist
+        os.makedirs(self.data_dir, exist_ok=True)
+
+        #File paths
         self.nhl_games_file_path = os.path.join(self.data_dir, 'nhl_game_data.json')
         self.nhl_players_file_path = os.path.join(self.data_dir, 'nhl_player_data.json')
         self.parsed_data_path = os.path.join(self.data_dir, 'parsed_shot_events.csv')
 ```
+
+Dans cet exemple, vous pouvez initialiser une instance du téléchargeur de données comme suit :
+
+```python
+downloader = NHLDataDownloader(start_season=2016, final_season = 2023)
+```
+
+Cela configure la plage des saisons de 2016 à 2023 et sauvegardera les données dans le répertoire `data`. Si jamais ce repertoire n'existe pas, la méthode d'intialisation s'occupera de sa création.
+
 ## Récupération des données de jeu de la NHL
-La méthode `get_nhl_game_data` permet de récupérer les données de jeu directement depuis l'API de la NHL. Cette méthode effectue les étapes suivantes :
+La méthode `get_nhl_game_data()` permet de récupérer les données brutes des matchs directement depuis l'API de la NHL. Elle effectue les étapes suivantes: 
 
-1. Construction de l'identifiant de match : Chaque match NHL est identifié par un `gameId`, qui est utilisé pour faire des requêtes à l'API de la NHL. Ce `gameId` est basé sur l'année de la saison et un numéro de match.
-2. Requête à l'API : Pour chaque match, une requête HTTP est envoyée à l'API de la NHL pour récupérer les événements du match.
-3. Sauvegarde des données brutes : Les données sont stockées dans un dictionnaire local nommé `all_data`, puis sauvegardées dans un fichier JSON (`nhl_game_data.json`) pour être utilisées lors des étapes ultérieures de traitement des données.
+1. **Construction de l'identifiant de match** : Chaque match NHL est identifié par un `gameId` unique, utilisé pour faire des requêtes à l'API de la NHL. Ce `gameId` est basé sur l'année de la saison et un numéro de match.
 
- `all_data`.
+2. **Requête à l'API** : Pour chaque match, une requête HTTP est envoyée à l'API de la NHL pour récupérer les données d'évènements (par exemple, tirs, buts, pénalités, etc.).
+
+3. **Sauvegarde des données brutes** : Les données sont stockées dans un dictionnaire (`all_data`), puis sauvegardées dans un fichier JSON (`nhl_game_data.json`), ce qui permet d'éviter une nouvelle requête lors des prochaines exécutions.
+
+Exemple d'utilisation de la méthode `get_nhl_game_data()`
+
 ```python 
 def get_nhl_game_data(self):
     all_data = {}
     for season in range(self.start_season, self.final_season + 1):
-        # ... (code to determine number of games)
+        # Code pour déterminer le nombre de matchs
+        # ...
         for game_num in range(1, num_regular_season_games + 1):
             game_id = f'{season}02{game_num:04d}'
             url = f'https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play'
@@ -51,28 +74,114 @@ def get_nhl_game_data(self):
             all_data[game_id] = game_data
 ```
 
-Cette méthode prend également en compte (en plus des parties de saison régulière) les parties des séries éliminatoires. Cette approche permet d'acquérir une grande quantité de données pour les saisons spécifiées, couvrant ainsi tous les matchs joués au cours de ces saisons. Bref, la classe `NHLDataDownloader` permet d'automatiser la récupération de données depuis l'API de la NHL, et de structurer ces données en vue de leur traitement et analyse future.
+Vous pouvez l'appeler comme ceci:
+```python
+downloader.get_nhl_game_data()
+```
+
+Cela va télécharger et sauvegarder les données brutes de tous les matchs des saisons spécifiées dans le fichier `nhl_game_data.json`.
+
+Cette méthode prend également en compte (en plus des parties de saison régulière) les parties des séries éliminatoires. Nous allons par le même processus bâtir le `gameId` de la partie en séries éliminatoires et faire une requête à l'API de la NHL pour acquérir les données brutes. 
+
+```python
+            # Playoff Games
+            rounds = 4
+            matchups_per_round = [8, 4, 2, 1]
+            max_games_per_series = 7
+            for round_num in range(1, rounds + 1):
+                for matchup_num in range(1, matchups_per_round[round_num - 1] + 1):
+                    for game_num in range(1, max_games_per_series + 1):
+                        game_id = f'{season}030{round_num}{matchup_num}{game_num}'
+                        url = f'https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play'
+                        print(f"Retrieving playoff data from '{url}'...")
+                        response = requests.get(url)
+                        if response.status_code == 200:
+                            game_data = response.json()
+                            all_data[game_id] = game_data
+                        else:
+                            print(f"No data found for playoff game {game_id}. Stopping the series.")
+                            break
+```
+
+Avec ces étapes, vous avez un pipeline complet pour acquérir et traiter les données play-by-play de la NHL des saisons régulières et éliminatoires spécifiées, prêt à être utilisé pour des analyses plus approfondies.
 
 # Outil de débogage interactif: Outil piwydget
-Cet outil est un outil efficace qui nous permet d'interagir avec les données en choisissant le match et l'évènements d'un match d'une saison donnée.
-On obtient alors une image de la patinoire montrant la position de l'évènement avec une description de celui-ci et des informations supplémentaires telles que:
-le score du match,les équipes qui se sont affrontées,la date du match ou encore la période de l'evènement.
+Ceci est un outil efficace qui nous permet d'interagir avec les données en choisissant le match et les évènements d'un match d'une saison donnée.
+On obtient alors une image de la patinoire montrant la position de l'évènement (démontré par un icône) avec une description de celui-ci et des informations supplémentaires telles que:
+le score du match, les équipes qui se sont affrontées, la date du match ou encore même la période quand l'évènement s'est produit.
 
+!["Widget interactif pour event de type Hit saison 2016-2017"](/assets/images/image.png)
+
+Voici une brève description des différentes parties du code:
+1. Gestion des données des joueurs:
+    * Un dictionnaire global player_names est utilisé pour stocker les noms des joueurs déjà récupérés, afin de limiter les requêtes répétitives. Les noms des joueurs sont chargés depuis un fichier JSON `nhl_player_data` dans le cas de son existence.  
+
+    * La fonction get_player_name() permet de rechercher le nom complet d'un joueur en fonction de son identifiant unique player_id. La fonction vérifie si le nom a déjà été récupéré pour éviter les appels redondants.
+
+2. Description d'évènements:
+    * Un dictionnaire `event_descriptions` permet de générer dynamiquement une description textuelle en fonction du type d'évènement (ex: un but, un tir bloqué, une pénalité, etc.).
+
+    * Chaque type d'évènement a sa propre fonction lambda qui crée une phrase descriptive basée sur les joueurs impliqués. Par exemple, pour un but, cela indique quel joueur a marqué contre quel gardien.
+
+3. Affichage des informations du match:
+    * La fonction `get_game_info()` prend en entrée l'ID d'un match (`game_id`) et retourne les informations principales liées au match: les équipes en compétition, le score, les tirs au bug (SoG), et l'heure du début du match.
+
+    * Les informations sont formatées dans une table HTML afin d'être facilement affichées dans l'interface.
+
+4. Affichage interactif avec widgets:
+    * La dernière partie du code définit une interface avec des widgets via `VBox` (qui est un conteneur vertical pour afficher plusieurs widgets ensemble). Les widgets incluent un slider pour sélectionner l'ID du match et un autre pour ses évènements. Il y a aussi des labels pour afficher les informations du match et de l'évènement, ainsi qu'une image de la patinoire montrant la position de ces évènements.
+
+    * La fonction `update_event_slider()` est appelée pour mettre à jour le slider des évènements en fonction des données du match sélectionné.
+
+Gestion des données des joueurs:
 ```python 
 player_names = {}  # Dictionnaire global pour stocker les noms des joueurs déjà récupérés
 # Chargement des données des joueurs depuis nhl_player_data.json
-nhl_player_data_path = NHL_PLAYER_DATA 
-with open(nhl_player_data_path, 'r') as player_file:
-    nhl_player_data = json.load(player_file)
+player_file_path = os.path.join('..', 'data', 'nhl_player_data.json')
+if os.path.exists(player_file_path):
+        with open(player_file_path, 'r') as file:
+            try:
+                # Load the JSON file into the dictionary
+                player_names = json.load(file)
+                print(f"Loaded {len(player_names)} players from the file.")
+            except json.JSONDecodeError as e:
+                print(f"Error reading player data: {e}")
+else:
+    print(f"Player file {player_file_path} not found.")
+    player_names = {}
 
 def get_player_name(player_id: int) -> str:
     """Lookup player full name by ID from nhl_player_data."""
     # Vérifier si le nom est déjà dans le dictionnaire
-    if player_id not in player_names:
-        player_names[player_id] = nhl_player_data.get(str(player_id), "Unknown Player")
-    return player_names[player_id]
+    if player_id is None:
+        return None
+
+    # Vérifier si le joueur est déjà dans le dictionnaire
+    if str(player_id) in player_names:
+        return player_names[str(player_id)]
+    
+    # Effectuer une requête à l'API pour récupérer les informations du joueur
+    url = f"https://api-web.nhle.com/v1/player/{player_id}/landing"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Lève une erreur si la requête échoue
+        player_data = response.json()
+        
+        # Extraire les noms du joueur (en accédant à la clé 'default')
+        first_name = player_data.get('firstName', {}).get('default', 'Unknown')
+        last_name = player_data.get('lastName', {}).get('default', 'Player')
+        full_name = f"{first_name} {last_name}"
+
+        # Stocker dans le dictionnaire pour éviter des appels répétés
+        player_names[str(player_id)] = full_name
+        
+        return full_name
+
+    except requests.RequestException as e:
+        print(f"Error fetching player data: {e}")
+        return "Unknown Player"
 ```
-Création de descriptions basées sur les types d'évènement:
+Description d'évènements:
 ```python
   # Créer une description basée sur le type d'événement
     event_descriptions = {
@@ -94,6 +203,8 @@ Création de descriptions basées sur les types d'évènement:
         "period-end": lambda: "The period has ended."
     }
 ```
+
+Affichage des informations du match:
 ```python
 def get_game_info(self, game_id):
         """Retourne les informations du match (Game ID, équipes, score, etc.)."""
@@ -138,6 +249,8 @@ def get_game_info(self, game_id):
        """
         return formatted_info
 ```
+
+Affichage interactif avec widgets:
 ```python
 # Conteneur pour afficher les widgets
 vbox = widgets.VBox([
@@ -154,44 +267,93 @@ display(vbox)
 update_event_slider()
 ```
 
-
-!["Widget interactif pour event de type Hit saison 2016-2017"](/assets/images/image.png)
+En résume, ce code permet de naviguer et d'afficher les informations d'un match de hockey et ses évènements de manière visuelle et interactive.
 
 
 # Nettoyage des données 
 Le traitement des données brutes est un aspect essentiel de l’analyse, et cela se fait dans la méthode `parse_nhl_game_data` de la classe `NHLDataDownloader`. Voici les étapes principales que cette méthode suit pour extraire et organiser les données relatives aux tirs dans les matchs de la NHL :
 
 
+1. Vérification de l'existence des données traitées:
+    * Avant de retraiter les données, la méthode vérifie si un fichier CSV contenant les évènements de tir a déjà été généré. Si ce fichier existe (`parsed_shot_events.csv`), il est directement chargé via `pd.read_csv()` pour éviter un retraitement iniutile des mêmes données.
 
-* Chargement des données de jeu : La méthode commence par vérifier si un fichier CSV contenant les événements de tir a déjà été généré. Si c’est le cas, ce fichier est chargé pour éviter de retraiter les mêmes données. Sinon, elle procède à l'extraction des données à partir du fichier JSON qui contient les données brutes des matchs, précédemment sauvegardé par la méthode `get_nhl_game_data`.
+2. Chargement des donées brutes:
+    * Si les données n'ont pas encore été traitées, elles sont chargées depuis un fichier JSON (`nhl_game_data.json`), qui contient les détails bruts des matchs de la NHL. Ces données comprennent tous les évènements survenus lors des matchs.
 
-* Filtrage des événements de tir : À partir des données brutes de chaque match, la méthode parcourt chaque événement (play) pour identifier ceux liés aux tirs, c’est-à-dire les événements de type 505 (but) et 506 (tir raté). Une fois identifiés, ces événements sont filtrés et les détails importants, comme l'identité du tireur, du gardien, le type de tir, et la situation du jeu, sont extraits.
+3. Filtrage des évènements liés aux tirs
+    * La méthode parcourt les évènements de chaque match en identifiant ceux liés aux tirs (types 505 pour les buts et 506 pour les shots on goal). Pour chaque tir, les détails importants, tels que l'identité du tireur, du gardien, la période du match, le type de tir, la situation de jeu (comme les avantages numériques), et les coordonnées dur tir sur la patinoire sont extraits et stockés dans un dictionnaire.
 
-* Gestion des données des joueurs : Pour enrichir les données des événements, la méthode fait appel à `get_player_name` qui associe les identifiants des joueurs (ID) à leurs noms complets. Cette méthode appelle l'API de la NHL pour récupérer les noms des joueurs à partir de leur ID si ceux-ci ne sont pas déjà stockés dans un fichier local (`nhl_player_data.json`). Une fois le nom récupéré, il est ajouté au dictionnaire des joueurs pour des requêtes futures plus rapides qui a pour but d'éviter les requêtes redondantes à l'API. 
+4. Gestion des données des joueurs
+    * Pour enrichir les données, les identifiants des joueurs (tireurs et gardiens) sont convertis en noms complets via la fonction `get_player_name()`. Cette fonction comme dans la section précédente, évite les appels redondants à l'API de la NHL en vérifiant si le nom du joueur a déjà été récupéré ou est stocké localement dans un fichier JSON (`nhl_player_data.json`)
 
-* Création d’un DataFrame : Pour chaque match, les événements de tir sont stockés dans une liste. À la fin de l'extraction des tirs pour un match, cette liste est convertie en un DataFrame Pandas. Ces DataFrames individuels sont ensuite concaténés en un seul DataFrame global qui regroupe tous les tirs des saisons spécifiées.
+5. Création d'un DataFrame Pandas:
+    * Une liste d'évènements de tir est accumulée pour chaque match. Cest évènements sont ensuite convertis en un DataFrame Pandas individuel pour chaque match. Ces DataFrames sont concaténés en un seul DataFrame global (`all_shot_events_df`), qui contient les évènements de tir de tous les matchs analysés.
 
-* Sauvegarde des données traitées : Une fois que tous les événements de tir sont extraits et organisés dans le DataFrame, les données sont sauvegardées dans un fichier CSV pour éviter de répéter le traitement lors des exécutions futures.
+6. Sauvegarde des données traitées:
+    * Une fois tous les évènements extraits et organisés dans le DataFrame, les données sont sauvegardées dans un fichier CSV (`parsed_shot_events.csv`). Cela Permet d'éviter de refaire le traitement lors des exécutions futures.
 
 ``` python
-def parse_nhl_game_data(self):
-    all_shot_events_df = pd.DataFrame()
-    with open(self.nhl_games_file_path, 'r') as json_file:
-        game_data = json.load(json_file)
-    for game_id, game_details in game_data.items():
-        all_plays = game_details.get('plays', [])
-        shot_events = []
-        for play in all_plays:
-            event_type = play.get('typeCode')
-            if event_type in [505, 506]:
-                # ... (code to extract shot details)
-                shot_events.append(shot_details)
-        if shot_events:
-            shot_events_df = pd.DataFrame(shot_events)
-            all_shot_events_df = pd.concat([all_shot_events_df, shot_events_df], ignore_index=True)
+    def parse_nhl_game_data(self):
+        """
+        Parses the NHL game data from a JSON file and filters for shot-related events.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing shot-related events for all games.
+        """
+
+        if os.path.exists(self.parsed_data_path):
+            print(f"Loading parsed data from {self.parsed_data_path}...")
+            return pd.read_csv(self.parsed_data_path)
+        
+        all_shot_events_df = pd.DataFrame()
+        
+        with open(self.nhl_games_file_path, 'r') as json_file:
+            game_data = json.load(json_file)
+
+        # Parsing data
+        for game_id, game_details in game_data.items():
+            print(f"Parsing game {game_id}")
+            all_plays = game_details.get('plays', [])
+            shot_events = []
+
+            for play in all_plays:
+                event_type = play.get('typeCode')
+                if event_type in [505, 506]:
+                    shooter_id = play.get('details', {}).get('scoringPlayerId') if event_type == 505 else play.get('details', {}).get('shootingPlayerId')
+                    goalie_id = play.get('details', {}).get('goalieInNetId')
+                    situation_code = play.get('situationCode')
+                    shot_details = {
+                        'season': game_details.get('season'),
+                        'gameId': game_id,
+                        'eventId': play.get('eventId'),
+                        'period': play.get('periodDescriptor', {}).get('number'),
+                        'timeInPeriod': play.get('timeInPeriod'),
+                        'eventType': play.get('typeDescKey'),
+                        'teamId': play.get('details', {}).get('eventOwnerTeamId'),
+                        'shooter': self.get_player_name(shooter_id),
+                        'goalie': self.get_player_name(goalie_id),
+                        'shotType': play.get('details', {}).get('shotType'),
+                        'emptyNetAway': False if int(situation_code[0]) == 1 else True,
+                        'emptyNetHome': False if int(situation_code[3]) == 1 else True,
+                        'powerplayHome': True if int(situation_code[2]) > int(situation_code[1]) else False,
+                        'powerplayAway': True if int(situation_code[1]) > int(situation_code[2]) else False,
+                        'coordinates': (play.get('details', {}).get('xCoord'), play.get('details', {}).get('yCoord')),
+                        'result': 'goal' if event_type == 505 else 'no goal'
+                    }
+                    shot_events.append(shot_details)
+
+            if shot_events:
+                shot_events_df = pd.DataFrame(shot_events)
+                all_shot_events_df = pd.concat([all_shot_events_df, shot_events_df], ignore_index=True)
+
+        all_shot_events_df.to_csv(self.parsed_data_path, index=False)
+        print(f"Parsed data saved to {self.parsed_data_path}")
+        return all_shot_events_df
 ```
 
-Grâce à ce processus, les données brutes de la NHL sont transformées en un format plus exploitable, permettant ainsi une analyse plus approfondie, comme l'exploration des tirs et des buts par type ou la comparaison de la performance des joueurs.
+Il est important de noter que la méthode prend en compte diverses situations de jeu, comme les tirs en avantage numérique et les buts dans des cages vides, ce qui permet de fournir des informations contextuelles précises pour chaque évènement. Les coordonnées des tirs sont également extraites, ce qui peut être utilisé pour des anlayses spatiales, comme des cartes de tirs qui vont être présentées dans les prochaines sections. 
+
+Bref, grâce à ce processus, les données brutes de la NHL sont transformées en un format plus exploitable, permettant ainsi une analyse plus approfondie, comme l'exploration des tirs et des buts par type ou la comparaison de la performance des joueurs.
 
 
 # Visualisations Simples
