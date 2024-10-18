@@ -47,7 +47,7 @@ Dans cet exemple, vous pouvez initialiser une instance du téléchargeur de donn
 downloader = NHLDataDownloader(start_season=2016, final_season = 2023)
 ```
 
-Cela configure la plage des saisons de 2016 à 2023 et sauvegardera les données dans le répertoire `data`. Si jamais ce repertoire n'existe pas, la méthode d'intialisation s'occupera de sa création.
+Cela configure la plage des saisons de 2016 à 2023 et sauvegardera les données dans le répertoire `data`. Si jamais ce repertoire n'existe pas, la méthode d'initialisation s'occupera de sa création.
 
 ## Récupération des données de jeu de la NHL
 La méthode `get_nhl_game_data()` permet de récupérer les données brutes des matchs directement depuis l'API de la NHL. Elle effectue les étapes suivantes: 
@@ -109,7 +109,7 @@ Avec ces étapes, vous avez un pipeline complet pour acquérir et traiter les do
 Ceci est un outil efficace qui nous permet d'interagir avec les données en choisissant le match et les évènements d'un match d'une saison donnée.
 
 On obtient alors une image de la patinoire montrant la position de l'évènement (démontré par un icône) avec une description de celui-ci et des informations supplémentaires telles que:
-le score du match, les équipes qui se sont affrontées, la date du match ou encore même la période quand l'évènement s'est produit.
+le score du match, les équipes qui se sont affrontées, la date du match ou encore la période où l'évènement s'est produit.
 
 !["Widget interactif pour event de type Hit saison 2016-2017"](/assets/images/image.png)
 
@@ -125,7 +125,7 @@ Voici une brève description des différentes parties du code:
     * Chaque type d'évènement a sa propre fonction lambda qui crée une phrase descriptive basée sur les joueurs impliqués. Par exemple, pour un but, cela indique quel joueur a marqué contre quel gardien.
 
 3. Affichage des informations du match:
-    * La fonction `get_game_info()` prend en entrée l'ID d'un match (`game_id`) et retourne les informations principales liées au match: les équipes en compétition, le score, les tirs au bug (SoG), et l'heure du début du match.
+    * La fonction `get_game_info()` prend en entrée l'ID d'un match (`game_id`) et retourne les informations principales liées au match: les équipes en compétition, le score, les tirs au but (SoG), et l'heure du début du match.
 
     * Les informations sont formatées dans une table HTML afin d'être facilement affichées dans l'interface.
 
@@ -510,7 +510,7 @@ Lors de la saison 2016-2017, l'équipe des Colorado Avalanche affiche un taux de
 
 
 ## Comparaison entre Buffalo Sabres et Tampa Bay Lightning, basée sur leurs cartes de tirs
-Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement à Tampa Bay, car la quasi-totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saisons, et davantage dans les zones proches du but. À l'inverse, Tampa Bay a énormément tiré au but sur ces saisons, surtout dans des zones proches du buts.
+Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement à Tampa Bay, car la quasi-totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saisons, et d'avantage dans les zones proches du but. À l'inverse, Tampa Bay a énormément tiré au but sur ces saisons, surtout dans des zones proches du buts.
 !["Profil de tir Buffalo Sabres 2018"](/assets/images/Sabres_2018.png)
 !["Profil de tir tampa bay 2018"](/assets/images/Bay_2018.png)
 
