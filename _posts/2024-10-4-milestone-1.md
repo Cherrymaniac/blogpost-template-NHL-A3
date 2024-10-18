@@ -290,13 +290,13 @@ Le traitement des données brutes est un aspect essentiel de l’analyse, et cel
     * Avant de retraiter les données, la méthode vérifie si un fichier CSV contenant les évènements de tir a déjà été généré. Si ce fichier existe (`parsed_shot_events.csv`), il est directement chargé via `pd.read_csv()` pour éviter un retraitement iniutile des mêmes données.
 
 2. Chargement des donées brutes:
-    * Si les données n'ont pas encore été traitées, elles sont chargées depuis un fichier JSON (`nhl_game_data.json`), qui contient les détails bruts des matchs de la NHL. Ces données comprennent tous les évènements survenus lors des matchs.
+    * Si les données n'ont pas encore été traitées, elles sont chargées depuis un fichier JSON (`nhl_game_data.json`), qui contient les détails bruts des matchs de la NHL. Ces données comprennent tous les évènements survenus lors des matchs[^gitlab-game-ids].
 
 3. Filtrage des évènements liés aux tirs
     * La méthode parcourt les évènements de chaque match en identifiant ceux liés aux tirs (types 505 pour les buts et 506 pour les shots on goal). Pour chaque tir, les détails importants, tels que l'identité du tireur, du gardien, la période du match, le type de tir, la situation de jeu (comme les avantages numériques), et les coordonnées dur tir sur la patinoire sont extraits et stockés dans un dictionnaire.
 
 4. Gestion des données des joueurs
-    * Pour enrichir les données, les identifiants des joueurs (tireurs et gardiens) sont convertis en noms complets via la fonction `get_player_name()`. Cette fonction comme dans la section précédente, évite les appels redondants à l'API de la NHL en vérifiant si le nom du joueur a déjà été récupéré ou est stocké localement dans un fichier JSON (`nhl_player_data.json`)
+    * Pour enrichir les données, les identifiants des joueurs (tireurs et gardiens) sont convertis en noms complets via la fonction `get_player_name()`[^github-reference]. Cette fonction comme dans la section précédente, évite les appels redondants à l'API de la NHL en vérifiant si le nom du joueur a déjà été récupéré ou est stocké localement dans un fichier JSON (`nhl_player_data.json`)
 
 5. Création d'un DataFrame Pandas:
     * Une liste d'évènements de tir est accumulée pour chaque match. Cest évènements sont ensuite convertis en un DataFrame Pandas individuel pour chaque match. Ces DataFrames sont concaténés en un seul DataFrame global (`all_shot_events_df`), qui contient les évènements de tir de tous les matchs analysés.
@@ -432,7 +432,8 @@ Tout d'abord nous utiliserions les évènements relatifs aux pénalités. Lorsqu
 
 ## 1. Comparaison des types de tirs
 
-Nous commençons par comparer la fréquence des différents types de tirs, en visualisant à la fois le nombre total de tirs et le nombre de buts marqués pour chaque type de tir. Pour ce faire, nous avons décidé de représenter cela dans un histogramme en barres où les tirs sont mis à côté des buts marqués.
+Nous commençons par comparer la fréquence des différents types de tirs, en visualisant à la fois le nombre total de tirs et le nombre de buts marqués pour chaque type de tir. Pour se faire nous avons décidé de répresenter ça dans un histogramme en barres ou les tirs sont mis à coté des goals marqués, car cela permet de comparer facilement les deux ensembles de données et d'observer les différences de réussite entre les types de tirs.[^barplot]
+
 
 !["Nombre de tirs et de buts par type de tir 2022-2023"](/assets/images/Bar_typetirbut.jpg)
 Le graphe ne nous aide pas vraiment à cause de la disparité dans les valeurs des données tirs/buts. Nous séparons donc cela en 2 sous-figures et ajoutons également le pourcentage de buts marqués :
@@ -442,9 +443,10 @@ De ce graphe, nous observons:
 
 * `Tir le plus commun` : Le tir "wrist" est de loin le plus courant, comme le montre le nombre d'essais par rapport aux autres types de tirs. Cependant, son pourcentage de réussite n'est pas aussi élevé que celui d'autres tirs moins courants, comme le "bat" ou le "tip in".
 
-## Analyse de la relation entre la distance des tirs et les chances de but
-Nous avons choisi de répondre à la question 2 à l'aide d'un graphique en courbes avec la distance en abscisse et le taux de probabilité de but en ordonnée.
+## Analyse de la Relation entre la Distance des Tirs et les Chances de But
+Nous avons choisi de répondre à la question 2 à l'aide d'un graphique lineaire, avec la distance en abscisse et le taux de probabilité de but en ordonnée. Nous avons supposé que les coordonnées des buts sont à (89, 0) et (-89, 0) et que les tirs sont orientés vers le but. Les valeurs NaN des coordonnées ont été supprimées, car elles étaient peu nombreuses et leur élimination n'affecte pas significativement notre analyse.
 
+Pour visualiser la relation entre la distance des tirs et les chances de but, un graphique linéaire est adapté[^line]. Ce type de graphique permet d’observer facilement les tendances et les variations, ce qui est essentiel pour identifier comment les chances de but évoluent avec la distance des tirs.
 * Taux de Buts en Fonction de la Distance au But par Saison (2018-2019):
 !["Taux de Buts en Fonction de la Distance au But par Saison (2018-2019)"](/assets/images/Tauxdebutdistance2018.png)
 * Taux de Buts en Fonction de la Distance au But par Saison (2019-2020):
@@ -459,7 +461,7 @@ De ce graphe, nous observons:
 * La probabilité de marquer à la distance [0,10] à la saison 2018-2019 est plus basse comparé aux autres saisons.
 
 ## Visualisation du Pourcentage de Buts en Fonction de la Distance et des Types de Tirs
-Pour répondre à cette question, nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite d'un but par une heatmap.
+Pour répondre à cette question, nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite de marquage d'un but par une heatmap,car cela permet de visualiser clairement le pourcentage de réussite d'un but en fonction de deux variables catégoriques : le type de tir et la distance[^heat].
 ![" Pourcentage de Buts en Fonction de la Distance et des Types de Tirs 2022-2023"](/assets/images/Heatmap_final.png)
 Nous pouvons observer:
 * Le "cradle" est le type de tir le plus dangereux entre [0,10], suivi par le "bat".
@@ -468,7 +470,7 @@ Nous pouvons observer:
 * Le "wrap around" est de loin le pire tir.
 
 # Visualisations Complexes
-Un extrait du code pour le calcul du nombre de tirs par heure de la ligue pour toutes les saisons entre 2016 et 2020 :
+Un extrait du code pour le calcul du nombre de tirs par heure de la ligue pour toutes les saisons entre 2016 et 2020[^kag][^plotly] :
 
 
 ``` python
@@ -532,3 +534,4 @@ Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils 
 !["Profil de tir tampa bay 2020"](/assets/images/Bay_2020.png)
 
 Bien que ces profils de tir donnent une bonne perspective sur les performances d'une équipe, ils ne sont toutefois pas suffisants pour comprendre totalement les raisons du succès ou de l'échec d'une équipe. D'autres facteurs tels que l'identité du tireur, les zones de tir préférentielles d'une équipe, ou encore le fait que certaines équipes performent mieux à domicile qu'à l'extérieur sont d'autres paramètres qu'il faut prendre en compte pour comprendre le succès ou l'échec d'une équipe.
+{% include references.md %}
