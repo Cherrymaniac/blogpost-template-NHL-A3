@@ -457,7 +457,7 @@ Nous pouvons observer:
 * Le "wrap around" est de loin le pire tir.
 
 # Visualisations Complexes
-Un extrait du code du calcul du nombre de tirs par heure de la ligue pour toutes les saisons entre 2016 et 2020 :
+Un extrait du code pour le calcul du nombre de tirs par heure de la ligue pour toutes les saisons entre 2016 et 2020 :
 
 
 ``` python
@@ -496,7 +496,7 @@ Un extrait du code du calcul du nombre de tirs par heure de la ligue pour toutes
 !["Profil de tir Florida panthers 2018"](/assets/images/Panthers_2018.png)
 !["Profil de tir Florida panthers 2019"](/assets/images/Panthers_2019.png)
 !["Profil de tir Florida panthers 2020"](/assets/images/Panthers_2020.png)-->
-Nous avons également ajouter l'année en option pour naviguer plus facilement entre les saisons:
+Nous avons également ajouté l'année en option pour naviguer plus facilement entre les saisons:
 {% include NHL_plot2016-2021.html %}
 ## Discussion
 Ces graphiques montrent le profil de tir d'une équipe sur une saison donnée.
@@ -510,7 +510,7 @@ Lors de la saison 2016-2017, l'équipe des Colorado Avalanche affiche un taux de
 
 
 ## Comparaison entre Buffalo Sabres et Tampa Bay Lightning, basée sur leurs cartes de tirs
-Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement à Tampa Bay, car la quasi-totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saisons, et davantage dans les zones proches du but. À l'inverse, Tampa Bay a énormément tiré au but sur ces saisons, surtout dans des zones proches des buts.
+Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement à Tampa Bay, car la quasi-totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saisons, et davantage dans les zones proches du but. À l'inverse, Tampa Bay a énormément tiré au but sur ces saisons, surtout dans des zones proches du buts.
 !["Profil de tir Buffalo Sabres 2018"](/assets/images/Sabres_2018.png)
 !["Profil de tir tampa bay 2018"](/assets/images/Bay_2018.png)
 
