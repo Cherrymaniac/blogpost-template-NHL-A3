@@ -4,12 +4,13 @@ title: Milestone 1
 categories: Blog IFT6758_A3
 ---
 
+Edward Habelrih, Michel Wilfred Essono et Rayan Yahiaoui
 # Question 1 : Acquisition de données
 
 Dans cette section, nous détaillons le fonctionnement de la classe NHLDataDownloader qui gère l'acquisition des données brutes depuis l'API de la NHL. Elle se compose de trois parties principales : l'initialisation, la récupération des données, et le traitement des données.
 
 ## Initialisation de la classe
-L'initialisation de la classe `NHLDataDownloader` se fait à l'aide de trois arguments :
+L'initialisation de la classe `NHLDataDownloader` dans le fichier `data_acquisistion.py` se fait à l'aide de trois arguments :
 
 * start_season et final_season : Ces paramètres définissent la plage des saisons NHL à récupérer (par exemple, de 2016 à 2023).
 * data_dir (facultatif) : Ce paramètre permet de spécifier le répertoire de sauvegarde des données. Si aucun répertoire n'est fourni, le répertoire courant est utilisé par défaut.
@@ -54,25 +55,82 @@ def get_nhl_game_data(self):
 Cette méthode prend également en compte (en plus des parties de saison régulière) les parties des séries éliminatoires. Cette approche permet d'acquérir une grande quantité de données pour les saisons spécifiées, couvrant ainsi tous les matchs joués au cours de ces saisons. Bref, la classe `NHLDataDownloader` permet d'automatiser la récupération de données depuis l'API de la NHL, et de structurer ces données en vue de leur traitement et analyse future.
 
 # Outil de débogage interactif: Outil piwydget
-Cet outil est un outil efficace qui nous permet d'interagir avec les données en choisissant le match et l'évènements d'un match d'une saison donnée.
-On obtient alors une image de la patinoire montrant la position de l'évènement avec une description de celui-ci et des informations supplémentaires telles que:
-le score du match,les équipes qui se sont affrontées,la date du match ou encore la période de l'evènement.
+Ceci est un outil efficace qui nous permet d'interagir avec les données en choisissant le match et les évènements d'un match d'une saison donnée.
+On obtient alors une image de la patinoire montrant la position de l'évènement (démontré par un icône) avec une description de celui-ci et des informations supplémentaires telles que:
+le score du match, les équipes qui se sont affrontées, la date du match ou encore même la période quand l'évènement s'est produit.
 
+!["Widget interactif pour event de type Hit saison 2016-2017"](/assets/images/image.png)
+
+Voici une brève description des différentes parties du code:
+1. Gestion des données des joueurs:
+    * Un dictionnaire global player_names est utilisé pour stocker les noms des joueurs déjà récupérés, afin de limiter les requêtes répétitives. Les noms des joueurs sont chargés depuis un fichier JSON `nhl_player_data` dans le cas de son existence.  
+
+    * La fonction get_player_name() permet de rechercher le nom complet d'un joueur en fonction de son identifiant unique player_id. La fonction vérifie si le nom a déjà été récupéré pour éviter les appels redondants.
+
+2. Description d'évènements:
+    * Un dictionnaire `event_descriptions` permet de générer dynamiquement une description textuelle en fonction du type d'évènement (ex: un but, un tir bloqué, une pénalité, etc.).
+
+    * Chaque type d'évènement a sa propre fonction lambda qui crée une phrase descriptive basée sur les joueurs impliqués. Par exemple, pour un but, cela indique quel joueur a marqué contre quel gardien.
+
+3. Affichage des informations du match:
+    * La fonction `get_game_info()` prend en entrée l'ID d'un match (`game_id`) et retourne les informations principales liées au match: les équipes en compétition, le score, les tirs au bug (SoG), et l'heure du début du match.
+
+    * Les informations sont formatées dans une table HTML afin d'être facilement affichées dans l'interface.
+
+4. Affichage interactif avec widgets:
+    * La dernière partie du code définit une interface avec des widgets via `VBox` (qui est un conteneur vertical pour afficher plusieurs widgets ensemble). Les widgets incluent un slider pour sélectionner l'ID du match et un autre pour ses évènements. Il y a aussi des labels pour afficher les informations du match et de l'évènement, ainsi qu'une image de la patinoire montrant la position de ces évènements.
+
+    * La fonction `update_event_slider()` est appelée pour mettre à jour le slider des évènements en fonction des données du match sélectionné.
+
+Gestion des données des joueurs:
 ```python 
 player_names = {}  # Dictionnaire global pour stocker les noms des joueurs déjà récupérés
 # Chargement des données des joueurs depuis nhl_player_data.json
-nhl_player_data_path = NHL_PLAYER_DATA 
-with open(nhl_player_data_path, 'r') as player_file:
-    nhl_player_data = json.load(player_file)
+player_file_path = os.path.join('..', 'data', 'nhl_player_data.json')
+if os.path.exists(player_file_path):
+        with open(player_file_path, 'r') as file:
+            try:
+                # Load the JSON file into the dictionary
+                player_names = json.load(file)
+                print(f"Loaded {len(player_names)} players from the file.")
+            except json.JSONDecodeError as e:
+                print(f"Error reading player data: {e}")
+else:
+    print(f"Player file {player_file_path} not found.")
+    player_names = {}
 
 def get_player_name(player_id: int) -> str:
     """Lookup player full name by ID from nhl_player_data."""
     # Vérifier si le nom est déjà dans le dictionnaire
-    if player_id not in player_names:
-        player_names[player_id] = nhl_player_data.get(str(player_id), "Unknown Player")
-    return player_names[player_id]
+    if player_id is None:
+        return None
+
+    # Vérifier si le joueur est déjà dans le dictionnaire
+    if str(player_id) in player_names:
+        return player_names[str(player_id)]
+    
+    # Effectuer une requête à l'API pour récupérer les informations du joueur
+    url = f"https://api-web.nhle.com/v1/player/{player_id}/landing"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Lève une erreur si la requête échoue
+        player_data = response.json()
+        
+        # Extraire les noms du joueur (en accédant à la clé 'default')
+        first_name = player_data.get('firstName', {}).get('default', 'Unknown')
+        last_name = player_data.get('lastName', {}).get('default', 'Player')
+        full_name = f"{first_name} {last_name}"
+
+        # Stocker dans le dictionnaire pour éviter des appels répétés
+        player_names[str(player_id)] = full_name
+        
+        return full_name
+
+    except requests.RequestException as e:
+        print(f"Error fetching player data: {e}")
+        return "Unknown Player"
 ```
-Création de descriptions basées sur les types d'évènement:
+Description d'évènements:
 ```python
   # Créer une description basée sur le type d'événement
     event_descriptions = {
@@ -94,6 +152,8 @@ Création de descriptions basées sur les types d'évènement:
         "period-end": lambda: "The period has ended."
     }
 ```
+
+Affichage des informations du match:
 ```python
 def get_game_info(self, game_id):
         """Retourne les informations du match (Game ID, équipes, score, etc.)."""
@@ -138,6 +198,8 @@ def get_game_info(self, game_id):
        """
         return formatted_info
 ```
+
+Affichage interactif avec widgets:
 ```python
 # Conteneur pour afficher les widgets
 vbox = widgets.VBox([
@@ -154,8 +216,7 @@ display(vbox)
 update_event_slider()
 ```
 
-
-!["Widget interactif pour event de type Hit saison 2016-2017"](/assets/images/image.png)
+En résume, ce code permet de naviguer et d'afficher les informations d'un match de hockey et ses évènements de manière visuelle et interactive.
 
 
 # Nettoyage des données 
