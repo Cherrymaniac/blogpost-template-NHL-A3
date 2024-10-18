@@ -200,28 +200,37 @@ Grâce à ce processus, les données brutes de la NHL sont transformées en un f
 
 Nous commençons par comparer la fréquence des différents types de tirs, en visualisant à la fois le nombre total de tirs et le nombre de buts marqués pour chaque type de tir. Pour se faire nous avons décidé de répresenter ça dans un histogramme en barres ou les tirs sont mis à coté des goals marqués.
 
-!["Nombre de tirs et de buts par type de tir"](/assets/images/Bar_typetirbut.jpg)
-Le graphe ne nous aide pas vraiment à cause de la disparité dans les valeurs des données tirs/buts, nous representons donc ça en changeant l'échelle de l'axe des ordonnées en logarithmique, nous ajoutons également un graphe représentant les pourcentages sur l'axe des ordonnées opposées:
-!["Nombre de tirs et de buts par type de tir (Log) et pourcentage"](/assets/images/shottypelog.png)
+!["Nombre de tirs et de buts par type de tir 2022-2023"](/assets/images/Bar_typetirbut.jpg)
+Le graphe ne nous aide pas vraiment à cause de la disparité dans les valeurs des données tirs/buts, nous séparons donc ça en 2 sous figures, nous ajoutons également le pourcentage de but marqué:
+!["Nombre de tirs et de buts par type de tir et pourcentage 2022-2023"](/assets/images/stackedshottype.png)
 De ce graphe, nous observons:
 * `Tir le plus dangereux` : Le tir cradle a le pourcentage de réussite le plus élevé, bien qu'il soit le moins utilisé.
 
-* `Tir le plus commun` : Le tir du poignet est de loin le plus courant, comme le montre le nombre d'essais par rapport aux autres types de tirs. Cependant, son pourcentage de réussite n'est pas aussi élevé que celui d'autres tirs moins courants, comme le bat ou le tip in.
+* `Tir le plus commun` : Le tir zrist est de loin le plus courant, comme le montre le nombre d'essais par rapport aux autres types de tirs. Cependant, son pourcentage de réussite n'est pas aussi élevé que celui d'autres tirs moins courants, comme le bat ou le tip in.
 
 ## Analyse de la Relation entre la Distance des Tirs et les Chances de But
-Nous avons choisi de répondre à la question 2 à l'aide d'un graphique en courbes avec la distance en abscisse et le taux de probabilité de but en ordonnée. Nous avons également décidé de tracer les trois saisons sur le même graphique pour mieux observer les variations entre elles. Cela montre clairement qu'il existe une relation inverse entre la distance et le taux de réussite d'un but. Plus un tir est proche du but, moins le gardien a de temps pour réagir, ce qui augmente la probabilité de marquer.
+Nous avons choisi de répondre à la question 2 à l'aide d'un graphique en courbes avec la distance en abscisse et le taux de probabilité de but en ordonnée. 
+* Taux de Buts en Fonction de la Distance au But par Saison (2018-2019):
+!["Taux de Buts en Fonction de la Distance au But par Saison (2018-2019)"](/assets/images/Tauxdebutdistance2018.png)
+* Taux de Buts en Fonction de la Distance au But par Saison (2019-2020):
+!["Taux de Buts en Fonction de la Distance au But par Saison (2019-2020)"](/assets/images/Tauxdebutdistance2019.png)
+* Taux de Buts en Fonction de la Distance au But par Saison (2020-2021):
+!["Taux de Buts en Fonction de la Distance au But par Saison (2020-2021)"](/assets/images/Tauxdebutdistance2020.png)
+Nous avons également décidé de tracer les trois saisons sur le même graphique pour mieux observer les variations entre elles. Cela montre clairement qu'il existe une relation inverse entre la distance et le taux de réussite d'un but. Plus un tir est proche du but, moins le gardien a de temps pour réagir, ce qui augmente la probabilité de marquer.
 !["Taux de Buts en Fonction de la Distance au But par Saison (2018-2021)"](/assets/images/Tauxdebutdistance.jpg)
 De ce graphe, nous observons:
-* Le taux de probabilité de marquer un but selon la distance est stable par saison.
+* La probabilité de marquer un but selon la distance est plutôt stable par saison.
 * Une augmentation du taux de but à la distance [80,90] à la saison 2020-2021.
+* La probabilité de marquer à la distance [0,10] à la saison 2018-2019 est plus basse comparé aux autres saisons.
 
 ## Visualisation du Pourcentage de Buts en Fonction de la Distance et des Types de Tirs
 Pour répondre à cette question; nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite de marquage d'un but par une heatmap.
-![" Pourcentage de Buts en Fonction de la Distance et des Types de Tirs"](/assets/images/Heatmap_final.png)
+![" Pourcentage de Buts en Fonction de la Distance et des Types de Tirs 2022-2023"](/assets/images/Heatmap_final.png)
 Nous pouvons observer:
 * Le cradle est le type de tir le plus dangereux entre [0,10], le tir bat est second.
 * De 0 à 30, les tirs snaps et slaps sont les plus dangereux.
-* A une distance de 40 à 50, le poke est le plus dangereux avec taux de réussite de 40%.
+* A une distance de 30 à 50, le poke est le plus dangereux avec taux de réussite de 25-40%.
+* Le wrap around est de loin le pire tir.
 # Visualisations Complexes
 Un extrait du code du calcul du nombre de tirs par heure de la ligue pour toutes les saisons entre 2016 et 2020:
 
@@ -248,14 +257,24 @@ Un extrait du code du calcul du nombre de tirs par heure de la ligue pour toutes
 ```
 
 ## Exportation des 5 graphiques de la zone offensive pour les Florida panthers
+<b>Shot Maps pour la saison 2016-2017</b><br>
+{% include NHL_plot2016-2017.html %}
+<b>Shot Maps pour la saison 2017-2018</b><br>
+{% include NHL_plot2017-2018.html %}
+<b>Shot Maps pour la saison 2018-2019</b><br>
+{% include NHL_plot2018-2019.html %} 
+<b>Shot Maps pour la saison 2020-2021</b><br>
+{% include NHL_plot2020-2021.html %}
+<!--
 !["Profil de tir Florida panthers 2016"](/assets/images/Panthers_2016.png)
 !["Profil de tir Florida panthers 2017"](/assets/images/Panthers_2017.png)
 !["Profil de tir Florida panthers 2018"](/assets/images/Panthers_2018.png)
 !["Profil de tir Florida panthers 2019"](/assets/images/Panthers_2019.png)
-!["Profil de tir Florida panthers 2020"](/assets/images/Panthers_2020.png)
-
+!["Profil de tir Florida panthers 2020"](/assets/images/Panthers_2020.png)-->
+Nous avons également ajouter l'année en option pour naviguer plus facilement entre les saisons:
+{% include NHL_plot2016-2021.html %}
 ## Discussion
-Ces grapgiques montrent le profil de tir d'une équipe sur une saison donnée.Dans ce cas il s'agit des florida panthers.
+Ces graphiques montrent le profil de tir d'une équipe sur une saison donnée.
 De ces graphiques, on peut observer les zones du terrain dans lesquelles une équipe a tiré plus(ou moins) que la moyenne de la ligue et également observer à quel point cette différence est marquée. Cela peut nous permettre d'avoir une idée des performances de cette équipe sur la saison.Dans le cas particulier des Florida panther,on voit que pour les saisons 2017-2018 et 2018-2019,ils ont tiré bien au dessus de la moyenne dans des zones proches du but.De cela on peut penser qu'ils ont été bien classé lors de ces 2 saisons.
     
 ## Analyse de l’équipe Colorado Avalanche, comparaison des cartes de tirs entre 2016-2017 et 2020-2021
