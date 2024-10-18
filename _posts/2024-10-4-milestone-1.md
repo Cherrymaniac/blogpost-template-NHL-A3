@@ -107,6 +107,7 @@ Avec ces étapes, vous avez un pipeline complet pour acquérir et traiter les do
 
 # Outil de débogage interactif: Outil piwydget
 Ceci est un outil efficace qui nous permet d'interagir avec les données en choisissant le match et les évènements d'un match d'une saison donnée.
+
 On obtient alors une image de la patinoire montrant la position de l'évènement (démontré par un icône) avec une description de celui-ci et des informations supplémentaires telles que:
 le score du match, les équipes qui se sont affrontées, la date du match ou encore même la période quand l'évènement s'est produit.
 
@@ -114,7 +115,7 @@ le score du match, les équipes qui se sont affrontées, la date du match ou enc
 
 Voici une brève description des différentes parties du code:
 1. Gestion des données des joueurs:
-    * Un dictionnaire global player_names est utilisé pour stocker les noms des joueurs déjà récupérés, afin de limiter les requêtes répétitives. Les noms des joueurs sont chargés depuis un fichier JSON `nhl_player_data` dans le cas de son existence.  
+    * Un dictionnaire global player_names est utilisé pour stocker les noms des joueurs déjà récupérés, afin de limiter les requêtes répétitives. Les noms des joueurs sont chargés depuis un fichier JSON `nhl_player_data.json` dans le cas de son existence.  
 
     * La fonction get_player_name() permet de rechercher le nom complet d'un joueur en fonction de son identifiant unique player_id. La fonction vérifie si le nom a déjà été récupéré pour éviter les appels redondants.
 
@@ -271,7 +272,7 @@ En résume, ce code permet de naviguer et d'afficher les informations d'un match
 
 
 # Nettoyage des données 
-Le traitement des données brutes est un aspect essentiel de l’analyse, et cela se fait dans la méthode `parse_nhl_game_data` de la classe `NHLDataDownloader`. Voici les étapes principales que cette méthode suit pour extraire et organiser les données relatives aux tirs dans les matchs de la NHL :
+Le traitement des données brutes est un aspect essentiel de l’analyse, et cela se fait dans la méthode `parse_nhl_game_data()` de la classe `NHLDataDownloader`. Voici les étapes principales que cette méthode suit pour extraire et organiser les données relatives aux tirs dans les matchs de la NHL :
 
 
 1. Vérification de l'existence des données traitées:
@@ -291,6 +292,7 @@ Le traitement des données brutes est un aspect essentiel de l’analyse, et cel
 
 6. Sauvegarde des données traitées:
     * Une fois tous les évènements extraits et organisés dans le DataFrame, les données sont sauvegardées dans un fichier CSV (`parsed_shot_events.csv`). Cela Permet d'éviter de refaire le traitement lors des exécutions futures.
+    * Une méthode qui se nomme `save_player_names()` peut être appelé dans le cas que nous voulons sauvegardé les noms des joueurs qu'on a utilisés dans un fichier json (`nhl_player_data.json`)
 
 ``` python
     def parse_nhl_game_data(self):
@@ -351,9 +353,68 @@ Le traitement des données brutes est un aspect essentiel de l’analyse, et cel
         return all_shot_events_df
 ```
 
-Il est important de noter que la méthode prend en compte diverses situations de jeu, comme les tirs en avantage numérique et les buts dans des cages vides, ce qui permet de fournir des informations contextuelles précises pour chaque évènement. Les coordonnées des tirs sont également extraites, ce qui peut être utilisé pour des anlayses spatiales, comme des cartes de tirs qui vont être présentées dans les prochaines sections. 
+## Extrait du DataFrame
+!["df.head(10)"](/assets/images/df1.jpg)
 
-Bref, grâce à ce processus, les données brutes de la NHL sont transformées en un format plus exploitable, permettant ainsi une analyse plus approfondie, comme l'exploration des tirs et des buts par type ou la comparaison de la performance des joueurs.
+## Discussion sur la force réelle
+Si nous n'avions pas accès au données de la force réelle pour les tirs et les buts, voici comment notre équipe procéderait pour les recréer. 
+
+Tout d'abord nous utiliserions les évènements relatifs aux pénalités. Lorsque'une pénalité est enregistrée, elle modifie la force des équipes (par exemple, un avantage numérique de 5 contre 4). Voici un exemple d'évènement de pénalité dans les données:
+
+```
+                "eventId": 47,
+                "periodDescriptor": {
+                    "number": 1,
+                    "periodType": "REG",
+                    "maxRegulationPeriods": 3
+                },
+                "timeInPeriod": "13:25",
+                "timeRemaining": "06:35",
+                "situationCode": "1551",
+                "typeCode": 509,
+                "typeDescKey": "penalty",
+                "sortOrder": 161,
+                "details": {
+                    "xCoord": -90,
+                    "yCoord": -12,
+                    "zoneCode": "D",
+                    "typeCode": "MAJ",
+                    "descKey": "fighting",
+                    "duration": 5,
+                    "committedByPlayerId": 8474697,
+                    "drawnByPlayerId": 8474709,
+                    "eventOwnerTeamId": 9
+                }
+            },
+```
+
+Étapes pour calculer la force des équipes à partir des évènements de pénalité
+
+1. **Identifier le type de pénalités**: Les événements de pénalité incluent un champ `typeCode` et une clé `descKey` qui décrivent le type de pénalité. Dans cet exemple, la pénalité est une "fighting" (avec `descKey: "fighting"`) et a une durée de 5 minutes (`duration: 5`). Chaque type de pénalité a une durée prédéfinie, et cela impacte la force de l'équipe pénalisée pendant cette période.
+
+
+2. **Suivre le nombre de joueurs sur la glace**: Lorsqu'une pénalité est infligée, elle réduit le nombre de joueurs sur la glace pour l'équipe pénalisée. Il est nécessaire de maintenir un compteur qui suit le nombre de joueurs pour chaque équipe. Par exemple, si une équipe reçoit une pénalité mineure de 2 minutes, elle passe de 5 à 4 joueurs pendant la durée de la pénalité. Dans certains cas, la pénalité peut se terminer plus tôt si l'équipe en avantage numérique marque un but. Avec la durée de la pénalité et le moment précis où elle a été infligée, nous pouvons facilement prendre en compte ces facteurs.
+
+3. **Mise à jour dynamique de la force des équipes**: Au fur et à mesure que les événements de jeu (tirs, buts, etc.) surviennent pendant la durée de la pénalité, nous ajustons la force des équipes en fonction de la pénalité en cours. Cela permet de connaître la force exacte des équipes au moment de chaque événement. Nous gérons également les situations où plusieurs pénalités peuvent se produire simultanément. Notre système tiendra compte de toutes ces situations. Une structure de données contenant les temps de fin de chaque pénalité nous permettra de mettre à jour le nombre de joueurs de chaque équipe lorsque la pénalité se termine.
+
+
+
+## Caractéristiques supplémentaires
+ 
+1. **Rebond**: Un tir peut être classé comme un "rebond" si un autre tir a eu lieu juste avant et a été arrêté ou dévié sans que le jeu n'ait été interrompu. Pour identifier un rebond, nous pourrions vérifier si un tir survient dans un court laps de temps (par exemple, dans les 5 secondes) après un autre tir de la même équipe. Si ces conditions sont remplies, le deuxième tir pourrait être classé comme un rebond.
+
+2. **Tir en contre-attaque** : Un tir en contre-attaque se produit généralement juste après que l'équipe adverse ait perdu la possession de la rondelle. Pour l'identifier, nous pourrions examiner les événements de récupération de la rondelle ou d'interception par une équipe et vérifier si un tir est effectué rapidement après cette récupération (par exemple, dans les 10 secondes suivant le changement de possession). Si tel est le cas, le tir pourrait être classé comme une contre-attaque.
+
+3. **Angle de tir**: En utilisant les coordonnées du tir, nous pourrions calculer l'angle entre la ligne de but et le tireur pour identifier les tirs réalisés sous un angle difficile. Ces tirs, bien qu’ayant un taux de réussite plus faible, peuvent être analysés pour déterminer si certains joueurs ou équipes réussissent mieux dans ces situations.
+
+    L'angle peut être calculé en utilisant l'arrctangeante: 
+
+    `angle = arctan(yCoord / abs(x_goal - xCoord))`
+
+4. **Distance du tir par rapport au but**: En utilisant les coordonnées du tir (`xCoord` et `yCoord`) nous pourrions calculer la distance entre la position du tireur et le but en utilisant la distance euclidienne:
+
+    `distance = sqrt((x_goal - xCoord)^2 + (y_goal - yCoord)^2)`
+
 
 
 # Visualisations Simples
