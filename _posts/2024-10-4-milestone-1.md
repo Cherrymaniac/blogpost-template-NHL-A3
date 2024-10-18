@@ -421,18 +421,19 @@ Tout d'abord nous utiliserions les évènements relatifs aux pénalités. Lorsqu
 
 ## 1. Comparaison des types de tirs
 
-Nous commençons par comparer la fréquence des différents types de tirs, en visualisant à la fois le nombre total de tirs et le nombre de buts marqués pour chaque type de tir. Pour se faire nous avons décidé de répresenter ça dans un histogramme en barres ou les tirs sont mis à coté des goals marqués.
+Nous commençons par comparer la fréquence des différents types de tirs, en visualisant à la fois le nombre total de tirs et le nombre de buts marqués pour chaque type de tir. Pour ce faire, nous avons décidé de représenter cela dans un histogramme en barres où les tirs sont mis à côté des buts marqués.
 
 !["Nombre de tirs et de buts par type de tir 2022-2023"](/assets/images/Bar_typetirbut.jpg)
-Le graphe ne nous aide pas vraiment à cause de la disparité dans les valeurs des données tirs/buts, nous séparons donc ça en 2 sous figures, nous ajoutons également le pourcentage de but marqué:
+Le graphe ne nous aide pas vraiment à cause de la disparité dans les valeurs des données tirs/buts. Nous séparons donc cela en 2 sous-figures et ajoutons également le pourcentage de buts marqués :
 !["Nombre de tirs et de buts par type de tir et pourcentage 2022-2023"](/assets/images/stackedshottype.png)
 De ce graphe, nous observons:
-* `Tir le plus dangereux` : Le tir cradle a le pourcentage de réussite le plus élevé, bien qu'il soit le moins utilisé.
+* `Tir le plus dangereux` : Le tir "cradle" a le pourcentage de réussite le plus élevé, bien qu'il soit le moins utilisé.
 
-* `Tir le plus commun` : Le tir zrist est de loin le plus courant, comme le montre le nombre d'essais par rapport aux autres types de tirs. Cependant, son pourcentage de réussite n'est pas aussi élevé que celui d'autres tirs moins courants, comme le bat ou le tip in.
+* `Tir le plus commun` : Le tir "wrist" est de loin le plus courant, comme le montre le nombre d'essais par rapport aux autres types de tirs. Cependant, son pourcentage de réussite n'est pas aussi élevé que celui d'autres tirs moins courants, comme le "bat" ou le "tip in".
 
-## Analyse de la Relation entre la Distance des Tirs et les Chances de But
-Nous avons choisi de répondre à la question 2 à l'aide d'un graphique en courbes avec la distance en abscisse et le taux de probabilité de but en ordonnée. 
+## Analyse de la relation entre la distance des tirs et les chances de but
+Nous avons choisi de répondre à la question 2 à l'aide d'un graphique en courbes avec la distance en abscisse et le taux de probabilité de but en ordonnée.
+
 * Taux de Buts en Fonction de la Distance au But par Saison (2018-2019):
 !["Taux de Buts en Fonction de la Distance au But par Saison (2018-2019)"](/assets/images/Tauxdebutdistance2018.png)
 * Taux de Buts en Fonction de la Distance au But par Saison (2019-2020):
@@ -447,15 +448,16 @@ De ce graphe, nous observons:
 * La probabilité de marquer à la distance [0,10] à la saison 2018-2019 est plus basse comparé aux autres saisons.
 
 ## Visualisation du Pourcentage de Buts en Fonction de la Distance et des Types de Tirs
-Pour répondre à cette question; nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite de marquage d'un but par une heatmap.
+Pour répondre à cette question, nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite d'un but par une heatmap.
 ![" Pourcentage de Buts en Fonction de la Distance et des Types de Tirs 2022-2023"](/assets/images/Heatmap_final.png)
 Nous pouvons observer:
-* Le cradle est le type de tir le plus dangereux entre [0,10], le tir bat est second.
-* De 0 à 30, les tirs snaps et slaps sont les plus dangereux.
-* A une distance de 30 à 50, le poke est le plus dangereux avec taux de réussite de 25-40%.
-* Le wrap around est de loin le pire tir.
+* Le "cradle" est le type de tir le plus dangereux entre [0,10], suivi par le "bat".
+* De 0 à 30, les tirs "snaps" et "slaps" sont les plus dangereux.
+* À une distance de 30 à 50, le "poke" est le plus dangereux avec un taux de réussite de 25-40%.
+* Le "wrap around" est de loin le pire tir.
+
 # Visualisations Complexes
-Un extrait du code du calcul du nombre de tirs par heure de la ligue pour toutes les saisons entre 2016 et 2020:
+Un extrait du code du calcul du nombre de tirs par heure de la ligue pour toutes les saisons entre 2016 et 2020 :
 
 
 ``` python
@@ -498,17 +500,17 @@ Nous avons également ajouter l'année en option pour naviguer plus facilement e
 {% include NHL_plot2016-2021.html %}
 ## Discussion
 Ces graphiques montrent le profil de tir d'une équipe sur une saison donnée.
-De ces graphiques, on peut observer les zones du terrain dans lesquelles une équipe a tiré plus(ou moins) que la moyenne de la ligue et également observer à quel point cette différence est marquée. Cela peut nous permettre d'avoir une idée des performances de cette équipe sur la saison.Dans le cas particulier des Florida panther,on voit que pour les saisons 2017-2018 et 2018-2019,ils ont tiré bien au dessus de la moyenne dans des zones proches du but.De cela on peut penser qu'ils ont été bien classé lors de ces 2 saisons.
+De ces graphiques, on peut observer les zones du terrain dans lesquelles une équipe a tiré plus (ou moins) que la moyenne de la ligue et également observer à quel point cette différence est marquée. Cela peut nous permettre d'avoir une idée des performances de cette équipe sur la saison. Dans le cas particulier des Florida Panthers, on voit que pour les saisons 2017-2018 et 2018-2019, ils ont tiré bien au-dessus de la moyenne dans des zones proches du but. De cela, on peut penser qu'ils ont été bien classés lors de ces 2 saisons.
     
 ## Analyse de l’équipe Colorado Avalanche, comparaison des cartes de tirs entre 2016-2017 et 2020-2021
-Lors de la saison 2016-2017, l'équipe de Colorado Avalanche affiche un taux de tirs relativement faible devant le filet (à 10-20 pieds du but) comparé à la moyenne de la ligue à la même position. En revanche, pendant la saison 2020-2021, on observe une augmentation du taux de tirs près du filet, ce qui pourrait expliquer leur montée dans le classement entre 2016 et 2020.
+Lors de la saison 2016-2017, l'équipe des Colorado Avalanche affiche un taux de tirs relativement faible devant le filet (à 10-20 pieds du but) comparé à la moyenne de la ligue à la même position. En revanche, pendant la saison 2020-2021, on observe une augmentation du taux de tirs près du filet, ce qui pourrait expliquer leur montée dans le classement entre 2016 et 2020.
 !["Profil de tir Avalanche 2016"](/assets/images/Avalanche_2016.png)
 
 !["Profil de tir Avalanche 2020"](/assets/images/Avalanche_2020.png)
 
 
 ## Comparaison entre Buffalo Sabres et Tampa Bay Lightning, basée sur leurs cartes de tirs
-Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement au Tampay bay car la quasi totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saison et ce davantge pour les zones qui sont proches du but.À l'inverse, les Tampa bay ont énormément tiré au but sur ces saisons et dans des zones proches des buts.
+Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement à Tampa Bay, car la quasi-totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saisons, et davantage dans les zones proches du but. À l'inverse, Tampa Bay a énormément tiré au but sur ces saisons, surtout dans des zones proches des buts.
 !["Profil de tir Buffalo Sabres 2018"](/assets/images/Sabres_2018.png)
 !["Profil de tir tampa bay 2018"](/assets/images/Bay_2018.png)
 
@@ -518,7 +520,4 @@ Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils 
 !["Profil de tir Buffalo Sabres 2020"](/assets/images/Sabres_2020.png)
 !["Profil de tir tampa bay 2020"](/assets/images/Bay_2020.png)
 
-Bien que ces profils de tir donnent une bonne perspective sur les performances d'une équipe,elles ne sont toute fois pas suffisantes pour totalement comprendre les raisons du succès ou de l'échec d'une équipe. D'autres facteurs tels que l'identité du tireur, les zones de tir preférentiels d'une équipe, le fait que certaines équipes perfoment mieux à domicile qu'à l'extérieur sont d'autres paramètres qu'il faut prendre en compte pour comprendre le succès ou l'échec d'une équipe.
-
-
-
+Bien que ces profils de tir donnent une bonne perspective sur les performances d'une équipe, ils ne sont toutefois pas suffisants pour comprendre totalement les raisons du succès ou de l'échec d'une équipe. D'autres facteurs tels que l'identité du tireur, les zones de tir préférentielles d'une équipe, ou encore le fait que certaines équipes performent mieux à domicile qu'à l'extérieur sont d'autres paramètres qu'il faut prendre en compte pour comprendre le succès ou l'échec d'une équipe.
