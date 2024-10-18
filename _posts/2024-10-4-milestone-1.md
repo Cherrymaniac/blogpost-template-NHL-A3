@@ -7,43 +7,65 @@ categories: Blog IFT6758_A3
 Edward Habelrih, Michel Wilfred Essono et Rayan Yahiaoui
 # Question 1 : Acquisition de données
 
-Dans cette section, nous détaillons le fonctionnement de la classe NHLDataDownloader qui gère l'acquisition des données brutes depuis l'API de la NHL. Elle se compose de trois parties principales : l'initialisation, la récupération des données, et le traitement des données.
+Dans cette section, nous expliquons comment utiliser la classe `NHLDataDownloader` du fichier `data_acquisisiton.py` pour gérer l'acquisistion des données brutes depuis l'API de la NHL. Ce processus se compose de trois parties principales: l'initialisation, la récupération des données, et le traitement des données. Nous allons élaborer d'avantage sur cette troisième étape dans la troisième section du blog. 
 
 ## Initialisation de la classe
-L'initialisation de la classe `NHLDataDownloader` dans le fichier `data_acquisistion.py` se fait à l'aide de trois arguments :
+L'initialisation de la classe `NHLDataDownloader` nécessite trois arguments:
 
-* start_season et final_season : Ces paramètres définissent la plage des saisons NHL à récupérer (par exemple, de 2016 à 2023).
-* data_dir (facultatif) : Ce paramètre permet de spécifier le répertoire de sauvegarde des données. Si aucun répertoire n'est fourni, le répertoire courant est utilisé par défaut.
+* `start_season` et `final_season` : Ces paramètres définissent la plage des saisons NHL à récupérer (par exemple, de 2016 à 2023).
+* `data_dir` (facultatif) : Ce paramètre permet de spécifier le répertoire de sauvegarde des données. Si aucun répertoire n'est fourni, le répertoire `data` est utilisé par défaut.
 
-Les fichiers clés sont générés automatiquement dans le répertoire choisi :
+Les fichiers générés dans le répertoire choisi contiennent les données brutes et traitées des matchs de la NHL. Voici les fichiers clés:
 
-1.  nhl_game_data.json : Contient les données brutes des matchs.
-2.  nhl_player_data.json : Contient les noms des joueurs associés à leurs ID.
-3.  parsed_shot_events.csv : Contient les données traitées relatives aux tirs.
+1.  **nhl_game_data.json** : Contient les données brutes des matchs.
+2.  **nhl_player_data.json** : Contient les noms des joueurs associés à leurs ID.
+3.  **parsed_shot_events.csv** : Contient les données traitées relatives aux tirs.
 
+Exemple d'initialisation:
 ```python
 class NHLDataDownloader:
     def __init__(self, start_season, final_season, data_dir=None):
         self.start_season = start_season
         self.final_season = final_season
-        self.data_dir = data_dir if data_dir else os.getcwd()
+        
+        #Points to the data folder
+        root_directory = os.path.abspath(os.path.join(os.getcwd(), '..'))
+        self.data_dir = data_dir if data_dir else os.path.join(root_directory, 'data')
+
+        #Create directory if it doesn't already exist
+        os.makedirs(self.data_dir, exist_ok=True)
+
+        #File paths
         self.nhl_games_file_path = os.path.join(self.data_dir, 'nhl_game_data.json')
         self.nhl_players_file_path = os.path.join(self.data_dir, 'nhl_player_data.json')
         self.parsed_data_path = os.path.join(self.data_dir, 'parsed_shot_events.csv')
 ```
+
+Dans cet exemple, vous pouvez initialiser une instance du téléchargeur de données comme suit :
+
+```python
+downloader = NHLDataDownloader(start_season=2016, final_season = 2023)
+```
+
+Cela configure la plage des saisons de 2016 à 2023 et sauvegardera les données dans le répertoire `data`. Si jamais ce repertoire n'existe pas, la méthode d'intialisation s'occupera de sa création.
+
 ## Récupération des données de jeu de la NHL
-La méthode `get_nhl_game_data` permet de récupérer les données de jeu directement depuis l'API de la NHL. Cette méthode effectue les étapes suivantes :
+La méthode `get_nhl_game_data()` permet de récupérer les données brutes des matchs directement depuis l'API de la NHL. Elle effectue les étapes suivantes: 
 
-1. Construction de l'identifiant de match : Chaque match NHL est identifié par un `gameId`, qui est utilisé pour faire des requêtes à l'API de la NHL. Ce `gameId` est basé sur l'année de la saison et un numéro de match.
-2. Requête à l'API : Pour chaque match, une requête HTTP est envoyée à l'API de la NHL pour récupérer les événements du match.
-3. Sauvegarde des données brutes : Les données sont stockées dans un dictionnaire local nommé `all_data`, puis sauvegardées dans un fichier JSON (`nhl_game_data.json`) pour être utilisées lors des étapes ultérieures de traitement des données.
+1. **Construction de l'identifiant de match** : Chaque match NHL est identifié par un `gameId` unique, utilisé pour faire des requêtes à l'API de la NHL. Ce `gameId` est basé sur l'année de la saison et un numéro de match.
 
- `all_data`.
+2. **Requête à l'API** : Pour chaque match, une requête HTTP est envoyée à l'API de la NHL pour récupérer les données d'évènements (par exemple, tirs, buts, pénalités, etc.).
+
+3. **Sauvegarde des données brutes** : Les données sont stockées dans un dictionnaire (`all_data`), puis sauvegardées dans un fichier JSON (`nhl_game_data.json`), ce qui permet d'éviter une nouvelle requête lors des prochaines exécutions.
+
+Exemple d'utilisation de la méthode `get_nhl_game_data()`
+
 ```python 
 def get_nhl_game_data(self):
     all_data = {}
     for season in range(self.start_season, self.final_season + 1):
-        # ... (code to determine number of games)
+        # Code pour déterminer le nombre de matchs
+        # ...
         for game_num in range(1, num_regular_season_games + 1):
             game_id = f'{season}02{game_num:04d}'
             url = f'https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play'
@@ -52,7 +74,36 @@ def get_nhl_game_data(self):
             all_data[game_id] = game_data
 ```
 
-Cette méthode prend également en compte (en plus des parties de saison régulière) les parties des séries éliminatoires. Cette approche permet d'acquérir une grande quantité de données pour les saisons spécifiées, couvrant ainsi tous les matchs joués au cours de ces saisons. Bref, la classe `NHLDataDownloader` permet d'automatiser la récupération de données depuis l'API de la NHL, et de structurer ces données en vue de leur traitement et analyse future.
+Vous pouvez l'appeler comme ceci:
+```python
+downloader.get_nhl_game_data()
+```
+
+Cela va télécharger et sauvegarder les données brutes de tous les matchs des saisons spécifiées dans le fichier `nhl_game_data.json`.
+
+Cette méthode prend également en compte (en plus des parties de saison régulière) les parties des séries éliminatoires. Nous allons par le même processus bâtir le `gameId` de la partie en séries éliminatoires et faire une requête à l'API de la NHL pour acquérir les données brutes. 
+
+```python
+            # Playoff Games
+            rounds = 4
+            matchups_per_round = [8, 4, 2, 1]
+            max_games_per_series = 7
+            for round_num in range(1, rounds + 1):
+                for matchup_num in range(1, matchups_per_round[round_num - 1] + 1):
+                    for game_num in range(1, max_games_per_series + 1):
+                        game_id = f'{season}030{round_num}{matchup_num}{game_num}'
+                        url = f'https://api-web.nhle.com/v1/gamecenter/{game_id}/play-by-play'
+                        print(f"Retrieving playoff data from '{url}'...")
+                        response = requests.get(url)
+                        if response.status_code == 200:
+                            game_data = response.json()
+                            all_data[game_id] = game_data
+                        else:
+                            print(f"No data found for playoff game {game_id}. Stopping the series.")
+                            break
+```
+
+Avec ces étapes, vous avez un pipeline complet pour acquérir et traiter les données play-by-play de la NHL des saisons régulières et éliminatoires spécifiées, prêt à être utilisé pour des analyses plus approfondies.
 
 # Outil de débogage interactif: Outil piwydget
 Ceci est un outil efficace qui nous permet d'interagir avec les données en choisissant le match et les évènements d'un match d'une saison donnée.
