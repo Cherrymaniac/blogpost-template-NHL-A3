@@ -444,7 +444,7 @@ De ce graphe, nous observons:
 * `Tir le plus commun` : Le tir "wrist" est de loin le plus courant, comme le montre le nombre d'essais par rapport aux autres types de tirs. Cependant, son pourcentage de réussite n'est pas aussi élevé que celui d'autres tirs moins courants, comme le "bat" ou le "tip in".
 
 ## Analyse de la Relation entre la Distance des Tirs et les Chances de But
-Nous avons choisi de répondre à la question 2 à l'aide d'un graphique lineaire, avec la distance en abscisse et le taux de probabilité de but en ordonnée. Nous avons supposé que les coordonnées des buts sont à (89, 0) et (-89, 0) et que les tirs sont orientés vers le but. Les valeurs NaN des coordonnées ont été supprimées, car elles étaient peu nombreuses et leur élimination n'affecte pas significativement notre analyse.
+Nous avons choisi de répondre à la question 2 à l'aide d'un graphique lineaire, avec la distance en abscisse et le taux de probabilité de but en ordonnée. Nous avons supposé que les coordonnées des buts sont à (89, 0) et (-89, 0)[^coordinates-system]. Les valeurs NaN des coordonnées ont été supprimées, car elles étaient peu nombreuses et leur élimination n'affecte pas significativement notre analyse.
 
 Pour visualiser la relation entre la distance des tirs et les chances de but, un graphique linéaire est adapté[^line]. Ce type de graphique permet d’observer facilement les tendances et les variations, ce qui est essentiel pour identifier comment les chances de but évoluent avec la distance des tirs.
 * Taux de Buts en Fonction de la Distance au But par Saison (2018-2019):
@@ -509,21 +509,23 @@ Un extrait du code pour le calcul du nombre de tirs par heure de la ligue pour t
 !["Profil de tir Florida panthers 2018"](/assets/images/Panthers_2018.png)
 !["Profil de tir Florida panthers 2019"](/assets/images/Panthers_2019.png)
 !["Profil de tir Florida panthers 2020"](/assets/images/Panthers_2020.png)-->
-Nous avons également ajouté l'année en option pour naviguer plus facilement entre les saisons:
+Nous avons également ajouté l'option de sélectionner l'année pour naviguer plus facilement entre les saisons:
 {% include NHL_plot2016-2021.html %}
 ## Discussion
 Ces graphiques montrent le profil de tir d'une équipe sur une saison donnée.
-De ces graphiques, on peut observer les zones du terrain dans lesquelles une équipe a tiré plus (ou moins) que la moyenne de la ligue et également observer à quel point cette différence est marquée. Cela peut nous permettre d'avoir une idée des performances de cette équipe sur la saison. Dans le cas particulier des Florida Panthers, on voit que pour les saisons 2017-2018 et 2018-2019, ils ont tiré bien au-dessus de la moyenne dans des zones proches du but. De cela, on peut penser qu'ils ont été bien classés lors de ces 2 saisons.
+De ces graphiques, on peut observer les zones du terrain dans lesquelles une équipe a tiré plus (ou moins) que la moyenne de la ligue et également observer à quel point cette différence est marquée. Cela peut nous permettre d'avoir une idée des performances de cette équipe sur la saison. Dans le cas particulier des Florida Panthers, on voit que pour les saisons 2017-2018 et 2018-2019, ils ont tiré bien au-dessus de la moyenne dans des zones proches du but. De cela, on peut penser qu'ils ont été bien classés lors de ces 2 saisons. Entre les 4 saisons, les concentrations de tirs proviennent de lieux différents. Cela peut suggérer soit l'arrivée de nouveaux joueurs dans l'équipe, soit des changements stratégiques majeurs.
+
     
 ## Analyse de l’équipe Colorado Avalanche, comparaison des cartes de tirs entre 2016-2017 et 2020-2021
-Lors de la saison 2016-2017, l'équipe des Colorado Avalanche affiche un taux de tirs relativement faible devant le filet (à 10-20 pieds du but) comparé à la moyenne de la ligue à la même position. En revanche, pendant la saison 2020-2021, on observe une augmentation du taux de tirs près du filet, ce qui pourrait expliquer leur montée dans le classement entre 2016 et 2020.
+Lors de la saison 2016-2017, l'équipe des Colorado Avalanche affiche un taux de tirs relativement faible devant le filet (à 10-20 pieds du but) comparé à la moyenne de la ligue à la même position. En revanche, pendant la saison 2020-2021, on observe une augmentation du taux de tirs près du filet, ce qui pourrait expliquer leur montée dans le classement entre 2016 et 2020. Il va de soi que plus de tirs mènent à long terme à plus de buts, et plus de buts à probablement plus de victoires.
+
 !["Profil de tir Avalanche 2016"](/assets/images/Avalanche_2016.png)
 
 !["Profil de tir Avalanche 2020"](/assets/images/Avalanche_2020.png)
 
 
 ## Comparaison entre Buffalo Sabres et Tampa Bay Lightning, basée sur leurs cartes de tirs
-Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement à Tampa Bay, car la quasi-totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saisons, et d'avantage dans les zones proches du but. À l'inverse, Tampa Bay a énormément tiré au but sur ces saisons, surtout dans des zones proches du buts.
+Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils n'ont pas beaucoup tiré au but lors de ces saisons comparativement à Tampa Bay, car la quasi-totalité des zones dans lesquelles ils ont tiré est en dessous de la moyenne des tirs de la ligue sur ces saisons, et d'avantage dans les zones proches du but. À l'inverse, Tampa Bay a énormément tiré au but durant ces saisons, surtout dans des zones proches du but.Probablement, les Sabres n'ont pas réussi à avoir une grande partie de temps offensif pendant leurs parties et cela s'explique en outre par leur position au classement général des équipes, qui a toujours été basse.  
 !["Profil de tir Buffalo Sabres 2018"](/assets/images/Sabres_2018.png)
 !["Profil de tir tampa bay 2018"](/assets/images/Bay_2018.png)
 
@@ -533,5 +535,8 @@ Le profil de tir des Buffalo Sabres pour les saisons 2018 à 2020 montre qu'ils 
 !["Profil de tir Buffalo Sabres 2020"](/assets/images/Sabres_2020.png)
 !["Profil de tir tampa bay 2020"](/assets/images/Bay_2020.png)
 
-Bien que ces profils de tir donnent une bonne perspective sur les performances d'une équipe, ils ne sont toutefois pas suffisants pour comprendre totalement les raisons du succès ou de l'échec d'une équipe. D'autres facteurs tels que l'identité du tireur, les zones de tir préférentielles d'une équipe, ou encore le fait que certaines équipes performent mieux à domicile qu'à l'extérieur sont d'autres paramètres qu'il faut prendre en compte pour comprendre le succès ou l'échec d'une équipe.
+Bien que ces profils de tir donnent une bonne perspective sur les performances d'une équipe, ils ne sont toutefois pas suffisants pour comprendre totalement les raisons du succès ou de l'échec d'une équipe. D'autres facteurs tels que l'identité du tireur, les zones de tir préférentielles d'une équipe, ou encore le fait que certaines équipes performent mieux à domicile qu'à l'extérieur sont d'autres paramètres qu'il faut prendre en compte pour comprendre le succès ou l'échec d'une équipe. De plus, la qualité des tirs n'est pas nécessairement prise en compte dans ces images. Une équipe peut effectuer de nombreux tirs de faible qualité et sembler, sur le papier, plus forte qu'une équipe avec moins de tirs, mais de bien meilleure qualité (et qui ont plus de chances d'être des buts). Bref, il y a de nombreux facteurs à considérer pour évaluer les succès ou problèmes d'une équipe.
+
 {% include references.md %}
+
+Nous aimerons aussi inclure dans nos références Copilot pour nous avoir aidé dans le processus du code.
