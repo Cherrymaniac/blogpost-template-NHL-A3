@@ -18,7 +18,7 @@ Veuillez rouler les notebooks du fichier `/notebooks` dans l'ordre suivant. Assu
 
 # Question 1 : Acquisition de données
 
-Dans cette section, nous expliquons comment utiliser la classe `NHLDataDownloader` du fichier `data_acquisisiton.py` pour gérer l'acquisistion des données brutes depuis l'API de la NHL. Ce processus se compose de trois parties principales: l'initialisation, la récupération des données, et le traitement des données. Nous allons élaborer d'avantage sur cette troisième étape dans la troisième section du blog. 
+Dans cette section, nous expliquons comment utiliser la classe `NHLDataDownloader` du fichier `data_acquisition.py` pour gérer l'acquisition des données brutes depuis l'API de la NHL. Ce processus se compose de trois parties principales: l'initialisation, la récupération des données, et le traitement des données. Nous allons élaborer d'avantage sur cette troisième étape dans la troisième section du blog. 
 
 ## Initialisation de la classe
 L'initialisation de la classe `NHLDataDownloader` nécessite trois arguments:
@@ -287,7 +287,7 @@ Le traitement des données brutes est un aspect essentiel de l’analyse, et cel
 
 
 1. Vérification de l'existence des données traitées:
-    * Avant de retraiter les données, la méthode vérifie si un fichier CSV contenant les évènements de tir a déjà été généré. Si ce fichier existe (`parsed_shot_events.csv`), il est directement chargé via `pd.read_csv()` pour éviter un retraitement iniutile des mêmes données.
+    * Avant de retraiter les données, la méthode vérifie si un fichier CSV contenant les évènements de tir a déjà été généré. Si ce fichier existe (`parsed_shot_events.csv`), il est directement chargé via `pd.read_csv()` pour éviter un retraitement inutile des mêmes données.
 
 2. Chargement des donées brutes:
     * Si les données n'ont pas encore été traitées, elles sont chargées depuis un fichier JSON (`nhl_game_data.json`), qui contient les détails bruts des matchs de la NHL. Ces données comprennent tous les évènements survenus lors des matchs[^gitlab-game-ids].
@@ -461,7 +461,7 @@ De ce graphe, nous observons:
 * La probabilité de marquer à la distance [0,10] à la saison 2018-2019 est plus basse comparé aux autres saisons.
 
 ## Visualisation du Pourcentage de Buts en Fonction de la Distance et des Types de Tirs
-Pour répondre à cette question, nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite de marquage d'un but par une heatmap,car cela permet de visualiser clairement le pourcentage de réussite d'un but en fonction de deux variables catégoriques : le type de tir et la distance[^heat].
+Pour répondre à cette question, nous avons décidé de représenter la relation entre la distance, le type de tir et le taux de réussite de marque d'un but par une heatmap,car cela permet de visualiser clairement le pourcentage de réussite d'un but en fonction de deux variables catégoriques : le type de tir et la distance[^heat].
 ![" Pourcentage de Buts en Fonction de la Distance et des Types de Tirs 2022-2023"](/assets/images/Heatmap_final.png)
 Nous pouvons observer:
 * Le "cradle" est le type de tir le plus dangereux entre [0,10], suivi par le "bat".
