@@ -76,7 +76,7 @@ Voici les observations clés:
 L'analyse montre clairement que la probabilité de marquer diminue avec l'augmentation de la distance et des angles extrêmes, mettant en évidence l'importance des zones de haut danger autour du filet. Les fluctuations observées à grande distance, principalement dans des situations de filet vide, soulignent l'influence des circonstances spécifiques sur la qualité des tirs. Ces résultats confirment l'importance de prendre en compte à la fois la distance et l'angle comme facteurs essentiels dans la modélisation des buts attendus, tout en intégrant des contextes tactiques des diverses équipes.
 
 ## 2.3 Buts sur Filet Vide vs Filet Non-Vide
- Finalement analyzons la relation entre le nombre de buts et la distance des tirs effectués. 
+ Finalement analysons la relation entre le nombre de buts et la distance des tirs effectués. 
 
 ![Histogrammes - Filet Vide et Non-Vide](/assets/images/milestone2/Nb_total_tirs_par_Distance.png)
 
@@ -586,4 +586,6 @@ Le code fournit une méthode ```log_filtered_dataframe()``` pour :
 
     Ce lien contient notre artifact des données filtrées pour le match de Winnipeg vs Washington qui s'est déroulé le 12 mars 2018. 
 
+# Modèles de base
 
+# Modèles avancés
