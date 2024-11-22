@@ -5,7 +5,11 @@ categories: Blog IFT6758_A3
 ---
 
 Edward Habelrih, Michel Wilfred Essono et Rayan Yahiaoui
+# Suivi des Expériences
 
+Tout au long de ce milestone, nous avons utilisé Weights & Biases (Wandb) pour sauvegarder et suivre nos modèles à travers leurs différentes itérations, ce qui nous a permis de comparer les résultats au fil du temps. Cet outil s’est avéré extrêmement utile, offrant à l’équipe un moyen simple et interactif de surveiller les progrès. Pour chaque exécution, nous avons enregistré les figures pertinentes ainsi que les paramètres de configuration utilisés pour entraîner le modèle. De plus, les modèles ont été sauvegardés en tant qu’artifacts associés à leurs exécutions respectives.
+
+Voici le lien vers notre espace de travail: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03
 # Ingénierie des Caractéristiques I
 
 ## 2.1 Histogrammes des Tirs
