@@ -92,6 +92,7 @@ Pour les tirs sur un filet Vide voici les observatinos clés:
 L’analyse montre des différences importantes entre les buts marqués sur filet vide et ceux sur filet non-vide. Les buts sur filet non-vide sont souvent dus à des tirs précis ou des actions rapprochées où le gardien est mis sous pression. En revanche, les filets vides permettent des tirs plus risqués et éloignés, souvent tentés depuis des positions inhabituelles. Ces résultats mettent en évidence l’influence des situations de jeu sur les opportunités de marquer et soulignent l’importance de traiter ces cas différemment dans l’analyse des buts attendus, pour mieux refléter les choix tactiques en fin de match.
 
 **IL RESTE A PROUVER LE DERNIER POINT DE CETTE SECTION** 
+<<<<<<< Updated upstream
 
 # Ingénierie des Caractéristiques II
 
@@ -589,3 +590,106 @@ Le code fournit une méthode ```log_filtered_dataframe()``` pour :
 # Modèles de base
 
 # Modèles avancés
+=======
+# Expérience No. 2
+
+## Entrée du journal : Q6_Random_forest
+
+### Prétraitement des données
+Nous avons commencé par traiter les données pour garantir leur qualité et leur pertinence. Pour les colonnes catégorielles avec beaucoup de valeurs, nous avons utilisé un encodage de fréquence pour transformer les catégories en leur proportion dans le jeu de données. Ensuite, nous avons effectué un encodage one-hot pour les valeurs binaires, facilitant ainsi leur interprétation par le modèle.
+Pour les données numériques manquantes, nous avons appliqué une imputation simple pour remplacer les valeurs manquantes par la médiane de chaque colonne.
+#### Colonnes spécifiques et transformations
+
+- **shotType** :
+  - Encodage de fréquence pour transformer chaque catégorie en sa proportion dans le jeu de données. Cela capture l'importance relative de chaque type de tir tout en réduisant la dimensionnalité.
+
+- **lastEventType** :
+  - Encodage de fréquence appliqué pour convertir les types d'événements précédents en valeurs normalisées représentant leur occurrence.
+
+- **HomevsAway** et **offensiveSide** :
+  - Utilisation de l'encodage one-hot avec `drop='first'` pour éviter la multicolinéarité. Cela crée des variables binaires pour chaque catégorie, en éliminant une catégorie de référence.
+
+- **shooter** :
+Le taux de réussite d'un joueur face à un goal est une valeur clé pour déterminer si un tir va réussir ou non. Nous avons utilisé un encodage cible avec lissage pour éviter le surapprentissage. Un encodage cible personnalisé (PlayerTargetEncoder) a été développé pour calculer un taux de réussite lissé pour chaque joueur.
+```python ```
+
+- **Caractéristiques numériques** (`shotDistance`, `shotAngle`, etc.) :
+Le modèle Random Forest n'a pas besoin de standardisation ou de normalisation; nous avons donc décidé de conserver les valeurs originales en utilisant la méthode 'passthrough', permettant ainsi au modèle d'interpréter directement ces valeurs.
+
+- **Caractéristiques binaires** (`emptyNetGoal`, `rebound`) :
+  - Conversion directe en entiers (0 ou 1) sans transformation complexe.
+
+### Stratégies de gestion des données
+
+#### Sous-échantillonnage
+
+Nous avons décidé d'utiliser le sous-échantillonnage après avoir essayé le suréchantillonnage et une combinaison des deux, car le sous-échantillonnage a donné de meilleurs résultats. Ceci était crucial en raison du déséquilibre significatif entre le nombre de tirs et de buts (ratio de 10:1). Sans sous-échantillonnage, le modèle avait tendance à prédire majoritairement des zéros plutôt que des uns.
+-Nous avons utilisé RandomUnderSampler avec un ratio de 0.35 pour rééquilibrer les classes et réduire la surreprésentation d'une catégorie. Ce ratio a été choisi après avoir tracé plusieurs métriques (accuracy, recall, precision, F1, ROC AUC) en testant différents taux d'échantillonnage pour observer l'évolution de ces métriques avec l'échantillonnage.
+
+!["Evolution des differentes metriques selon le taux d'Undersampling"](/assets/images/SamplingStrategy.png)
+#### Imputation
+- Pour les colonnes numériques comme `speed` et `distanceFromLastEvent`, nous avons utilisé la médiane pour remplacer les valeurs manquantes par des valeurs contextuellement pertinentes.
+-Nous avons egalement drop changeinShotAngle car trop de valeurs manquantes.
+### Caractéristiques dérivées
+Nous avons créé plusieurs caractéristiques dérivées pour enrichir notre modèle :
+-shots_period_cumsum : Nombre cumulatif de tirs par période et par équipe.
+-cumulative_possession_time : Temps de possession cumulatif. L'idée derrière cette caractéristique est que l'équipe ayant le plus de possession contrôle davantage le jeu et a donc plus de chances de marquer.
+-time_since_last_shot : Temps écoulé depuis le dernier tir. Plusieurs tirs consécutifs ont plus de chances de se traduire par un but.
+-consecutive_penalties : Nombre consécutif de pénalités. Plus une équipe accumule de pénalités, plus elle est désavantagée, ce qui facilite les opportunités de tir pour l'équipe adverse.
+-score_differential : Différence de score au moment du tir, en excluant évidemment le tir en question pour éviter tout data leakage. Cette caractéristique a été calculée en cumulant le score puis en appliquant un décalage d'une ligne (shift).
+Comme nous pouvons le voir sur l'histogramme ci-dessous: 
+!["Top 20 des caracteristiques les plus importantes"](/assets/images/Top20Carac.png)
+-Les valeurs ayant le plus d'impact sur la décision de l'arbre sont la distance(plus un joueur est proche du but, plus ses chances de marquer sont bonnes), la coordonnée y, et si le but est vide.
+-Parmi les nouvelles caractéristiques, seule shooter a eu un impact notable sur les performances(un meilleur joueur a plus de chance de marquer), time_since_last_shot a aussi un impact équivalent à l'angle du tir. Nous avons également essayé d'ajouter des caractéristiques basées sur le taux de victoire/défaite/nuls au cours de la saison, mais cela n'a pas eu d'influence significative sur le modèle. 
+### Pondération des classes
+
+Pour le `RandomForestClassifier`, nous avons attribué un poids différent à chaque classe, trouvant qu'un poids de 1:2 était optimal :
+
+- Classe 0 (non-but) : Poids 1
+- Classe 1 (but) : Poids 2
+
+Cela permet de donner plus d'importance aux événements de but, rares mais cruciaux.
+
+### Pipeline de prétraitement
+
+Notre pipeline combine plusieurs transformateurs :
+
+- Encodage cible pour les tireurs.
+- Transformation numérique 'passthrough'.
+- Encodage one-hot pour les caractéristiques catégorielles avec peu de catégories.
+- Conservation des caractéristiques binaires.
+
+### Optimisation des hyperparamètres
+Nous avons utilisé `RandomizedSearchCV` pour explorer :
+- Nombre d'estimateurs.
+- Profondeur maximale des arbres.
+- Nombre minimal de samples pour le split.
+- Nombre de features considérées.
+- Et autres paramètres de régularisation.
+
+### Validation
+Nous avons également éssayé la validation croisée stratifiée avec `StratifiedKFold` qvec 10 splits. Ce qui a légerement amélioré la qualité du modèle.
+```python 
+# Configuration de la validation croisée
+cv_splitter = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+```
+Comme métrique d'évaluation, nous avons choisi score ROC_AUC. Nous avons egalement experimente avec une version personnalite du Fbeta score car la precision et le recall du modele etaient bas. 
+```python 
+def custom_scorer(y_true, y_pred_proba, beta=1.0):
+    thresholds = np.arange(0.1, 0.9, 0.05)
+    best_score = 0
+    
+    for threshold in thresholds:
+        y_pred = (y_pred_proba >= threshold).astype(int)
+        precision = precision_score(y_true, y_pred)
+        recall = recall_score(y_true, y_pred)
+        
+        # F-beta score pour donner plus de poids à la précision ou au rappel
+        if precision + recall > 0:
+            score = (1 + beta**2) * (precision * recall) / (beta**2 * precision + recall)
+            best_score = max(best_score, score)
+            
+    return best_score
+```
+Cette approche détaillée et nuancée nous a permis de construire un modèle prédictif avec un score ROC_AUC de 0.76.
+>>>>>>> Stashed changes
