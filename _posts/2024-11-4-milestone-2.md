@@ -589,3 +589,123 @@ Le code fournit une méthode ```log_filtered_dataframe()``` pour :
 # Modèles de base
 
 # Modèles avancés
+
+Pour répondre au point 1 de cette section, nous avons entraîné un classificateur XGBoost en utilisant uniquement les caractéristiques de ```distance``` et d'```angle```. L'objectif de cette expérience était de comparer les performances de ce modèle avec la ligne de base établie dans la partie précédente à l'aide de la régression logistique. La configuration de l'entraînement a été réalisée avec une division 80/20 des données d'entraînement et de validation. Aucun réglage des hyperparamètres n'a été effectué à ce stade, le modèle XGBoost ayant été utilisé avec des paramètres par défaut.
+
+Voici les graphiques obtenus pour ce premier modèle:
+
+![ROC base model](/assets/images/milestone2/ROC Curve Display_base.png)
+
+La courbe ROC présente une AUC de 0.72, ce qui indique que le modèle est capable de différencier correctement les buts et les non-buts dans environ 72 % des cas. Bien que supérieure à la performance d'un classificateur aléatoire (AUC = 0.5), cette AUC est encore modérée. Cela peut indiquer que les caractéristiques utilisées (distance et angle) fournissent des informations utiles mais ne suffisent pas à capturer toute la complexité de la tâche. Le modèle montre une bonne discrimination pour des seuils faibles (proches de 0.2-0.4), mais la pente de la courbe suggère qu'il pourrait bénéficier d'une augmentation des caractéristiques explicatives ou d'un réglage des hyperparamètres.
+
+![Goal Rate base model](/assets/images/milestone2/Goal Rate_base.png)
+
+Le graphique du taux de buts montre une diminution progressive du taux de buts des percentiles supérieurs (100, 90) vers les percentiles inférieurs (10, 0). Par exemple :
+  - Les tirs classés dans le centile supérieur (90-100) présentent un taux de buts d'environ 30 %, ce qui indique que le modèle identifie correctement les tirs de haute qualité.
+  - En revanche, les percentiles inférieurs (0-10) montrent un taux de buts proche de 5 %, soulignant que le modèle attribue de faibles probabilités aux tirs moins susceptibles de réussir.
+
+Cependant, une transition plus marquée entre les percentiles moyens et supérieurs pourrait refléter un modèle encore mieux calibré ou capable de capturer davantage de nuances dans les données.
+
+![Calibration Curve base model](/assets/images/milestone2/Calibration Curve_base.png)
+
+La courbe de la proportion cumulée des buts indique que les tirs classés dans les percentiles supérieurs contiennent une proportion importante des buts :
+  - Environ 80 % des buts sont contenus dans les 30 % les plus probables (percentile 70 et plus), ce qui montre que le modèle est performant pour concentrer les buts dans les catégories de haute probabilité.
+  - Cette courbe met également en lumière une opportunité : dans les percentiles intermédiaires (40-70), la proportion des buts n’est pas entièrement exploitée, suggérant que des caractéristiques supplémentaires pourraient aider à mieux capturer ces situations.
+
+
+![Cumulative Goal Rate base model](/assets/images/milestone2/Cumulative Goal Rate_base.png)
+
+La courbe de calibration révèle que le modèle est globalement bien calibré mais montre des variations :
+  - Pour les probabilités basses (0.0 à 0.2), les prédictions du modèle sous-estiment légèrement la probabilité réelle de succès des tirs.
+  - À l’inverse, pour les probabilités moyennes (0.4 à 0.6), une sur-estimation est visible. Cela peut être dû à la simplicité des caractéristiques utilisées, qui limitent la capacité du modèle à différencier efficacement les tirs moyens des tirs de haute qualité.
+
+Ces analyses confirment que le modèle XGBoost exploite efficacement les caractéristiques de distance et d’angle pour prédire la probabilité qu’un tir soit un but. Cependant, des améliorations sont possibles en intégrant davantage de caractéristiques contextuelles et en ajustant les hyperparamètres.
+
+Dans le cadre de l’entraînement d’un classificateur XGBoost avec toutes les caractéristiques développées dans la Partie 4, une optimisation approfondie des hyperparamètres a été réalisée afin d'améliorer les performances globales du modèle. Ces caractéristiques comprenaient des informations contextuelles telles que le type d’événement précédent, les coordonnées, le temps écoulé, la vitesse, le rebond et le changement d’angle, en plus des caractéristiques fondamentales comme la distance et l’angle. L’objectif était d’exploiter la richesse de ces données pour surpasser les modèles basiques évalués précédemment.ts.
+
+Pour obtenir les meilleures performances, une optimisation bayésienne a été mise en œuvre pour ajuster les hyperparamètres, notamment max_depth (profondeur maximale des arbres), learning_rate (taux d’apprentissage), n_estimators (nombre d’arbres), subsample (fraction des échantillons utilisée pour chaque arbre), et colsample_bytree (fraction des caractéristiques utilisée pour chaque arbre). Une validation croisée stratifiée a été employée pour maximiser l’AUC-ROC. Aussi, trois boosters disponibles dans XGBoost ont été testés : gbtree, dart, et gblinear.
+
+Voici le résultat de notre validation croisée.
+
+![Cross-val F2](/assets/images/milestone2/cross_val_results_F2.png)
+
+Voici nos meilleurs paramètres obtenus.
+
+![ParamsF2](/assets/images/milestone2/bhp_f2.png)
+
+
+Le booster gbtree s’est avéré le plus performant, avec une AUC de 0.754, démontrant sa capacité à capturer les interactions complexes entre les caractéristiques. Il est particulièrement bien adapté aux données non linéaires, où des relations complexes existent entre les variables, comme la vitesse et le changement d’angle. À l’inverse, dart, qui utilise un mécanisme de dropout pour régulariser, a montré des performances légèrement inférieures, mais dans le même champ. Bien qu’il puisse être avantageux pour des ensembles de données plus vastes, il a ici sous-performé en raison de la structure des données. Enfin, gblinear, un modèle linéaire généralisé, n’a pas réussi à exploiter la complexité des interactions des données, obtenant une AUC bien inférieure, proche de 0.65.
+
+![ROC model 2](/assets/images/milestone2/ROC_F2.png)
+
+La courbe ROC du modèle optimisé présente une AUC de 0.75, marquant une amélioration significative par rapport au modèle basique (AUC = 0.72). Cela montre que le modèle est mieux capable de différencier les tirs qui sont des buts de ceux qui ne le sont pas. La forme convexe de la courbe, en particulier dans les zones critiques de faibles taux de faux positifs, indique une meilleure discrimination des buts. Cette amélioration résulte de l’intégration de caractéristiques contextuelles telles que la vitesse, le rebond et le type d’événement précédent, qui capturent davantage de nuances dans les données.
+
+![Goal Rate model 2](/assets/images/milestone2/GR_F2.png)
+
+Le graphique du taux de buts montre une priorisation plus efficace des tirs de haute qualité par le modèle optimisé :
+  - Les tirs classés dans le centile supérieur (90-100) atteignent un taux de buts proche de 100 %, ce qui est une amélioration remarquable par rapport au modèle basique (30 %). Ceci pourrait potentiellement du overfitting.
+  - En revanche, les centiles inférieurs (0-10) affichent un taux de buts proche de 5 %, ce qui est cohérent avec une attribution correcte de faibles probabilités aux tirs moins susceptibles de réussir.
+
+Ces résultats confirment que le modèle optimisé est capable de mieux hiérarchiser les tirs selon leur probabilité de réussite, surtout dans les percentiles les plus élevés. Toutefois, une légère amélioration dans les percentiles intermédiaires (40-70) pourrait encore être explorée pour capturer davantage de nuances.
+
+![Cumulative model 2](/assets/images/milestone2/CGR_F2.png)
+
+La courbe de la proportion cumulée des buts révèle que le modèle optimisé concentre encore mieux les buts dans les percentiles supérieurs :
+  - 90 % des buts sont contenus dans les 40 % des tirs les plus probables, contre seulement 80 % dans le modèle basique.
+  - La courbe est plus proche de l’idéal dans les percentiles supérieurs, confirmant que le modèle utilise efficacement les nouvelles caractéristiques pour prédire les buts.
+
+Cependant, dans les percentiles intermédiaires (30-70), il reste une marge d’amélioration pour capturer les buts classés comme probabilité moyenne.
+
+![Calibration curve model 2](/assets/images/milestone2/CC_F2.png)
+
+La courbe de calibration montre une correspondance quasi-parfaite entre les probabilités prédites et les fréquences réelles des buts :
+  - Contrairement au modèle basique, les probabilités basses (0.0 à 0.2) sont correctement estimées, et les probabilités moyennes (0.4 à 0.6) ne présentent plus de sur-estimation significative.
+  - Cette amélioration indique que l’optimisation des hyperparamètres a permis au modèle d’être non seulement plus performant, mais aussi mieux calibré, rendant ses prédictions plus fiables.
+
+Comparé au modèle de base XGBoost utilisant uniquement les caractéristiques de distance et angle avec une AUC de 0.72, le modèle optimisé montre une nette amélioration, atteignant une AUC de 0.754, grâce à l'ajout de caractéristiques supplémentaires et à l'optimisation des hyperparamètres. Le taux de buts pour les percentiles supérieurs (90-100) passe de 30 % à 35 %, indiquant une meilleure identification des tirs de haute qualité. De plus, la proportion cumulée des buts reste concentrée dans les 30 % les plus probables, mais avec une répartition plus précise des probabilités, reflétant un modèle mieux calibré. Enfin, la courbe de calibration du modèle optimisé est plus proche de la ligne idéale, réduisant les écarts entre les probabilités prédites et les probabilités observées, ce qui démontre une amélioration globale de la performance et de la fiabilité du nouveau modèle.  
+
+Dans cette prochaine section, nous allons explorer des techniques de sélection de caractéristiques pour simplifier nos caractéristiques d'entrées. Nous avons employé deux algorithmes: SelectKBest et Shap.
+
+SelectKBest est une technique simple mais efficace pour sélectionner les caractéristiques en fonction de tests statistiques. Ici, la fonction f_classif a été utilisée, basée sur l’ANOVA, pour calculer l’importance des caractéristiques en mesurant leur capacité à discriminer les classes. Les scores attribués par cette méthode ont été utilisés pour trier les caractéristiques par pertinence. Les dix meilleures caractéristiques selon ces scores ont été retenues pour construire un modèle plus léger et efficace. Cela a permis d’éliminer les caractéristiques redondantes ou peu pertinentes tout en réduisant la dimensionnalité du problème.
+
+![Top KBest](/assets/images/milestone2/select k best features.png)
+
+Nous avons utilisé la méthode SelectKBest pour identifier les 10 caractéristiques les plus pertinentes pour le modèle. Parmi celles-ci, la caractéristique shotDistance se démarque nettement avec un score de 7307.169, indiquant son influence majeure sur les prédictions du modèle. D'autres caractéristiques importantes, comme rebound, speed et powerplayHome, contribuent également de manière significative, mais dans une moindre mesure. Une optimisation des hyperparamètres a été réalisée pour améliorer les performances du modèle en utilisant ces caractéristiques sélectionnées. Cependant, le score final ROC_AUC obtenu était de 74.7, inférieur à celui obtenu avec la sélection basée sur SHAP (AUC de 0.75) et légèrement supérieur au modèle de base XGBoost (AUC de 0.72).
+
+La méthode SelectKBest a permis de réduire efficacement la dimensionnalité en se concentrant sur les corrélations statistiques entre chaque caractéristique et la variable cible. Toutefois, cette méthode manque de l'interprétabilité au niveau des instances que fournit SHAP.
+
+Ensuite, SHAP (SHapley Additive exPlanations) est une méthode basée sur la théorie des jeux pour expliquer les prédictions des modèles en attribuant une importance à chaque caractéristique. Il calcule les contributions marginales de chaque caractéristique en considérant toutes les combinaisons possibles, ce qui fait une approche robuste pour interpréter des modèles complexes. 
+
+La principale différence entre ces deux techniques est la relation entre les caractéristiques. SelectKBest est une méthode de sélection de caractéristiques basée uniquement sur une statistique univariée (comme le test ANOVA), évaluant chaque caractéristique indépendamment de toutes les autres. En revanche, SHAP prend en compte les interactions entre les caractéristiques et attribue des valeurs d'importance en fonction de leur contribution au modèle global. 
+
+Analysons en premier lieu notre meilleur modèle qui a été roulé avec l'analyse SHAP pour choisir les top 10 caractéristiques et qui a ensuite subi une validation croisée exactement comme dans la section précédente pour effectuer l'entraînment du meilleur modèle.
+
+![Top Shap features](/assets/images/milestone2/SHAP_TOP10.png)
+
+Le tableau montre les caractéristiques les plus importantes pour le modèle XGBoost optimisé, avec leurs valeurs moyennes SHAP. La caractéristique la plus influente est shotDistance, qui a une valeur moyenne SHAP significative de 0.7289. Cette caractéristique est suivie par yCoord (0.2592) et shotType (0.2152), entre autres. Ces résultats indiquent que la distance du tir et la position sur l'axe Y ont un impact notable sur la probabilité de succès d'un tir. Les autres caractéristiques, telles que shotAngle et speed, confirment également leur importance dans le contexte du hockey.
+
+![Shap HP](/assets/images/milestone2/shapHP.png)
+
+On peut également voir les hyper-paramètres optimaux suite à la validation croisée performée avec l'optimisation Bayes.
+
+![SHAP roc](/assets/images/milestone2/SHAProc.png)
+
+La courbe ROC est similaire au résultat précédent, cependant encore une fois la sélection de ce modèle en tant que notre meilleur XGBoost s'est joué dans les nombres décimaux. 
+
+![SHAP GR](/assets/images/milestone2/SHAPgr.png)
+
+Le graphique du taux de buts montre une nette corrélation entre les percentiles supérieurs des probabilités prédites et le taux de réussite des tirs. Les tirs classés dans les 10 % supérieurs présentent un taux de buts proche de 30 %, ce qui reflète une bonne identification des tirs de haute qualité.
+
+![SHAP CGR](/assets/images/milestone2/shapCGR.png)
+
+Ce graphique met en évidence que plus de 80 % des buts sont regroupés dans les 30 % les plus probables. Cela confirme que le modèle attribue correctement des scores de haute probabilité aux tirs susceptibles de réussir.
+
+
+![SHAP CC](/assets/images/milestone2/SHAPcc.png)
+
+Le graphique montre que le modèle est bien calibré pour des probabilités faibles à modérées, mais il surestime légèrement pour des probabilités élevées. Cela peut être attribué à la complexité des interactions entre les caractéristiques.
+
+
+Par rapport aux autres modèles testés, l’approche utilisant SHAP s’est avérée être la meilleure grâce à sa capacité à identifier les caractéristiques les plus pertinentes tout en améliorant la performance globale. Avec une AUC de 0.75, SHAP dépasse le modèle de base (AUC de 0.72) et les modèles optimisés par validation croisée, tout en simplifiant les données d’entrée en sélectionnant seulement 10 caractéristiques clés comme shotDistance, yCoord et shotType. Contrairement à SelectKBest, qui sélectionne des caractéristiques sans interprétation, SHAP offre une transparence unique en attribuant une importance précise à chaque caractéristique pour chaque prédiction, ce qui améliore l’interprétabilité et la robustesse du modèle. De plus, la calibration du modèle SHAP est bien ajustée, réduisant les biais observés dans les autres approches.
+
+Voici le lien de notre meilleur modèle de la famille XGBoost: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/vje687th
