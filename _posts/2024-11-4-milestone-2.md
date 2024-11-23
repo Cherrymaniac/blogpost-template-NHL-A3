@@ -912,3 +912,54 @@ Nous avons exploré les performances du modèle en fonction du nombre de voisins
 Le KNN montre une forte sensibilité au déséquilibre des classes, se traduisant par une précision faible et un recall instable. Bien que l'accuracy et le ROC AUC soient relativement stables, ils ne suffisent pas à compenser les lacunes du modèle sur la classe minoritaire.
 En résumé, bien que le sous-échantillonnage ait aidé à équilibrer les données, KNN semble limité pour ce problème en raison de sa forte dépendance à la densité locale des données.
 **Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/tw7yrhh8.
+
+
+# Évaluer sur l'ensemble de test
+
+Dans cette section, nous évaluons les performances de plusieurs modèles sur l'ensemble de test final. Nous utilisons d'abord les trois modèles simples développés précédemment, suivis d'un modèle de perceptron multicouche (MLP) personnalisé, optimisé pour cette tâche. Enfin, nous explorons un modèle XGBoost, accompagné de l'outil SHAP pour une sélection efficace des caractéristiques. Cette approche nous permet d'analyser la robustesse et l'efficacité de chaque méthode dans le cadre de notre problématique.
+
+Nous utilisons enfin les ensembles de tests générés dans les premières sections afin d'èvaluer le meilleur de nos modèles.
+
+**Résultats sur l'ensemble de test saison régulière 2020-2021**:
+
+!["ROC - reg"](/assets/images/milestone2/roc_test_r.png)
+
+La courbe ROC montre que le modèle XGBoost a la meilleure aire sous la courbe (AUC = 0.76), indiquant une meilleure performance globale pour séparer les classes positives et négatives. Il est suivi de près par le modèle de régression logistique utilisant les caractéristiques combinées (logreg_comb, AUC = 0.71) et celui utilisant uniquement la distance (logreg_dist, AUC = 0.70). Les modèles MLP (AUC = 0.63) et logreg_ang (AUC = 0.56) sont moins performants.
+
+!["GR - reg"](/assets/images/milestone2/gr_test_r.png)
+
+Le taux de buts en fonction des percentiles de probabilité montre que XGBoost reste supérieur, surtout dans les percentiles les plus élevés. Les modèles logreg_comb et logreg_dist suivent une tendance proche et cohérente, avec une performance stable. Les modèles MLP et logreg_ang montrent des fluctuations importantes, ce qui suggère une plus grande instabilité dans leurs prédictions pour les percentiles supérieurs.
+
+!["CC - reg"](/assets/images/milestone2/cc_test_r.png)
+
+Dans la courbe de calibration, XGBoost est relativement bien calibré pour les probabilités plus élevées. Cependant, pour les probabilités basses et moyennes, il semble s'écarter de la ligne de calibration parfaite. Le modèle MLP montre une tendance plus erratique, suggérant un besoin d'ajustement. Les modèles logreg_dist et logreg_comb présentent des comportements intermédiaires mais ne sont pas aussi proches de la calibration idéale.
+
+!["CG - reg"](/assets/images/milestone2/cgr_test_reg.png)
+
+Sur cette courbe, XGBoost domine encore, indiquant qu'il capte la majorité des buts de manière plus efficace à travers les percentiles. Logreg_comb et logreg_dist suivent une trajectoire similaire mais légèrement moins performante. MLP, bien qu'il présente une progression correcte, est globalement moins performant. Enfin, logreg_ang est le moins performant avec une faible proportion cumulée.
+
+XGBoost s'impose comme le modèle le plus performant sur l'ensemble de test, suivi de logreg_comb et logreg_dist. Les performances des modèles MLP et logreg_ang sont inférieures, nécessitant potentiellement un ajustement ou des améliorations dans leur configuration.
+
+En général, les modèles fonctionnent moins bien sur l'ensemble de test que sur l'ensemble de validation. Cela peut être attribué au sur-apprentissage ou à des différences entre les distributions des ensembles de données. Par exemple, bien que le MLP soit un modèle plus complexe et théoriquement capable de mieux capturer les relations non linéaires dans les données, il n'a pas atteint les performances attendues sur l'ensemble de test. Cela suggère que le MLP pourrait avoir surappris les caractéristiques spécifiques des données d'entraînement ou de validation, mais échoue à généraliser efficacement. 
+
+**Résultats sur l'ensemble de test de série éliminatoire**:
+
+!["ROC - p"](/assets/images/milestone2/roc_test_p.png)
+
+Dans les séries éliminatoires, le modèle XGBoost reste le meilleur avec une AUC de 0.74, montrant une bonne capacité à distinguer les classes. Cependant, son score est légèrement inférieur à celui observé pour la saison régulière. Les modèles logreg_comb (AUC = 0.69) et logreg_dist (AUC = 0.68) maintiennent des performances similaires à celles de la saison régulière, mais le modèle MLP (AUC = 0.65) reste en retrait, confirmant des difficultés à généraliser aux séries. Enfin, logreg_ang est toujours le modèle le moins performant avec une AUC de 0.57.
+
+!["GR - p"](/assets/images/milestone2/gr_test_p.png)
+
+Sur cette courbe, le modèle XGBoost montre à nouveau une performance stable, bien que les taux de buts tendent à être légèrement moins distincts entre les modèles dans les séries éliminatoires. Logreg_comb et logreg_dist offrent des performances compétitives. Cependant, MLP et logreg_ang présentent encore des fluctuations importantes, indiquant des prédictions moins fiables.
+
+!["CC - reg"](/assets/images/milestone2/cc_test_p.png)
+
+La calibration des modèles dans les séries éliminatoires révèle que XGBoost reste relativement bien calibré pour les hautes probabilités, mais moins précis pour les basses probabilités. Les modèles logreg_comb et logreg_dist montrent un comportement légèrement amélioré comparé à la calibration dans la saison régulière. Cependant, le modèle MLP reste mal calibré, ce qui peut expliquer ses performances limitées dans d'autres métriques.
+
+!["CG - reg"](/assets/images/milestone2/cgr_test_p.png)
+
+La proportion cumulée des buts montre une tendance similaire à celle de la saison régulière, avec XGBoost en tête, suivi des modèles logreg_comb et logreg_dist. Ces derniers montrent une capacité à suivre les performances de XGBoost de manière satisfaisante. MLP et logreg_ang présentent une performance inférieure, avec une difficulté à capturer efficacement les buts cumulés.
+
+Les résultats pour les séries éliminatoires confirment une légère baisse des performances globales des modèles par rapport à la saison régulière, probablement en raison des différences dans les données des séries. En effet, les séries accueillent un nombre exclusif d'équipes voulant dire que les patterns que nous avons appris dans les données d'entraînement ne s'appliquement pas entièrement à ces matchs. Aussi, en séries éliminatoires les équipes changent leurs stratégies de jeux ce qui peut mener à beaucoup de scénarois différents de buts qu'on a jamais vus auparavant. Le modèle XGBoost reste le plus performant et robuste, suivi de près par logreg_comb et logreg_dist. Le MLP, bien qu'étant un modèle plus complexe, continue de décevoir en termes de généralisation, particulièrement dans des contextes comme les séries où les données peuvent être moins prévisibles.
+
+**Lien du run de test:** https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/kkfh7fyo?
