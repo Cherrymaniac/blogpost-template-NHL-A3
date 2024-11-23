@@ -594,7 +594,11 @@ Le code fournit une méthode ```log_filtered_dataframe()``` pour :
 
 # Modèles avancés
 
-Pour répondre au point 1 de cette section, nous avons entraîné un classificateur XGBoost en utilisant uniquement les caractéristiques de ```distance``` et d'```angle```. L'objectif de cette expérience était de comparer les performances de ce modèle avec la ligne de base établie dans la partie précédente à l'aide de la régression logistique. La configuration de l'entraînement a été réalisée avec une division 80/20 des données d'entraînement et de validation. Aucun réglage des hyperparamètres n'a été effectué à ce stade, le modèle XGBoost ayant été utilisé avec des paramètres par défaut.
+Le code lié à cette section se retrouve dans ```advanced_models.py``` sous le directory ```src```. Pour répondre au point 1 de cette section, nous avons entraîné un classificateur XGBoost en utilisant uniquement les caractéristiques de ```distance``` et d'```angle```. L'objectif de cette expérience était de comparer les performances de ce modèle avec la ligne de base établie dans la partie précédente à l'aide de la régression logistique. La configuration de l'entraînement a été réalisée avec une division 80/20 des données d'entraînement et de validation. Aucun réglage des hyperparamètres n'a été effectué à ce stade, le modèle XGBoost ayant été utilisé avec des paramètres par défaut.
+
+Liens vers les runs des deux premiers modèles:
+Modèle de base: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/cdkbmot8?
+Modèle avec caractéristiques de la section 4: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/k7dxw7d0?
 
 Voici les graphiques obtenus pour ce premier modèle:
 
