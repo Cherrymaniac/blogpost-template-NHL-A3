@@ -97,7 +97,7 @@ De plus, nous avons utilisé le GameCenter de la LNH et des vidéos sur YouTube 
 
 Après cette analyse minutieuse, nous avons détecté une anomalie. En effet, James van Riemsdyk n'a pas marqué son but comme sous-entendent les coordonnées de l'API (dernière ligne de l'image). En effet en allant à 3:10 minutes de cette vidéo, du côté droit de la patinoire et non du côté gauche comme sous-entendu par la valeur de l'API. 
 
-![Anomalie](/assets/images/milestone2/anomalie.png)
+![Anomalie](/assets/images/milestone2/anomaly.png)
 
 Lien vers la vidéo: https://www.youtube.com/watch?v=liPQYJVSXpw&start=190
 
@@ -622,7 +622,9 @@ Le code fournit une méthode ```log_filtered_dataframe()``` pour :
 Le code lié à cette section se retrouve dans ```advanced_models.py``` sous le directory ```src```. Pour répondre au point 1 de cette section, nous avons entraîné un classificateur XGBoost en utilisant uniquement les caractéristiques de ```distance``` et d'```angle```. L'objectif de cette expérience était de comparer les performances de ce modèle avec la ligne de base établie dans la partie précédente à l'aide de la régression logistique. La configuration de l'entraînement a été réalisée avec une division 80/20 des données d'entraînement et de validation. Aucun réglage des hyperparamètres n'a été effectué à ce stade, le modèle XGBoost ayant été utilisé avec des paramètres par défaut.
 
 Liens vers les runs des deux premiers modèles:
+
 Modèle de base: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/cdkbmot8?
+
 Modèle avec caractéristiques de la section 4: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/k7dxw7d0?
 
 Voici les graphiques obtenus pour ce premier modèle:
@@ -889,8 +891,9 @@ def custom_scorer(y_true, y_pred_proba, beta=1.0):
 ```
 
 Cette approche détaillée et nuancée nous a permis de construire un modèle prédictif avec un score ROC_AUC de 0.77,un recall de 60% et une précision assez basse de 22%. Pour améliorer le modèle, l'ajout de nouvelle features semble nécessaire.
+
 **Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/d45pn2k2
-# Modèles avancés
+
 ## Q6_KNN (K-Nearest Neighbors)
 
 Voici les graphiques obtenus pour le modèle KNN:
@@ -1016,7 +1019,7 @@ parameter_space = {
 }
 
 ```
-!["Pipeline du modèle"](/assets/images/milestone2/pipeline.png.PNG)
+
 
 ### Conclusion
 Le KNN montre une forte sensibilité au déséquilibre des classes, se traduisant par une précision faible et un recall instable. Bien que l'accuracy et le ROC AUC soient relativement stables, ils ne suffisent pas à compenser les lacunes du modèle sur la classe minoritaire.
