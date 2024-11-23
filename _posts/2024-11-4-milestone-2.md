@@ -17,7 +17,7 @@ Voici le lien vers notre espace de travail: https://wandb.ai/michel-wilfred-esso
 ### Distance du Filet
 Nous avons généré deux histogrammes illustrant le nombre de tirs (buts et non-buts séparés) en fonction de leur distance par rapport au filet, à partir des données des saisons régulières 2016-2017 à 2019-2020 (inclus). 
 
-![Histogrammes des Tirs - Distance](/assets/images/milestone2/Distribution_Tirs_par_Distance(2016-2019).png)
+![Histogrammes des Tirs - Distance](/assets/images/milestone2/Nb_total_tirs_par_Distance.png.png)
 
 Voici les observations clés:
   - Le nombre total de tirs diminue rapidement aux alentours de 60 mètres. 
@@ -78,7 +78,7 @@ L'analyse montre clairement que la probabilité de marquer diminue avec l'augmen
 ## 2.3 Buts sur Filet Vide vs Filet Non-Vide
  Finalement analysons la relation entre le nombre de buts et la distance des tirs effectués. 
 
-![Histogrammes - Filet Vide et Non-Vide](/assets/images/milestone2/Nb_total_tirs_par_Distance.png)
+![Histogrammes - Filet Vide et Non-Vide](/assets/images/milestone2/Distribution_Tirs_par_Distance(2016-2019).png)
 
 Pour les tirs sur un filet Non-Vide voici les observations clés:
 - La majorité des buts sur filet non-vide sont marqués à proximité immédiate du filet, dans la zone de haut danger. Ces tirs sont souvent effectués à partir de rebonds ou de passes rapides qui laissent peu de temps au gardien pour réagir.
