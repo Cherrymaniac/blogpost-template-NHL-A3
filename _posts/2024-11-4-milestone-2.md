@@ -91,11 +91,17 @@ Pour les tirs sur un filet Vide voici les observatinos clés:
 
 L’analyse montre des différences importantes entre les buts marqués sur filet vide et ceux sur filet non-vide. Les buts sur filet non-vide sont souvent dus à des tirs précis ou des actions rapprochées où le gardien est mis sous pression. En revanche, les filets vides permettent des tirs plus risqués et éloignés, souvent tentés depuis des positions inhabituelles. Ces résultats mettent en évidence l’influence des situations de jeu sur les opportunités de marquer et soulignent l’importance de traiter ces cas différemment dans l’analyse des buts attendus, pour mieux refléter les choix tactiques en fin de match.
 
-Nous avons procédé à une analyse approfondie des données pour détecter d’éventuelles anomalies. Pour cela, nous avons divisé la tâche entre les trois membres de l'équipe, chacun examinant 30 matchs pour un total de 90 matchs analysés. Durant cette analyse, nous avons vérifié attentivement les coordonnées (x, y), les types de tirs, et les autres caractéristiques associées aux événements.
+Nous avons procédé à une analyse approfondie des données pour détecter d’éventuelles anomalies. Pour cela, nous avons divisé la tâche entre les trois membres de l'équipe, chacun examinant 40 matchs pour un total de 120 matchs analysés. Durant cette analyse, nous avons vérifié attentivement les coordonnées (x, y), les types de tirs, et les autres caractéristiques associées aux événements.
 
-De plus, nous avons utilisé le GameCenter de la LNH pour confirmer nos observations en visionnant les clips vidéo correspondants aux buts pour chaque match analysé. Cela nous a permis de valider que les événements enregistrés dans les données reflètent bien la réalité des situations de jeu.
+De plus, nous avons utilisé le GameCenter de la LNH et des vidéos sur YouTube pour confirmer nos observations en visionnant les clips vidéo correspondants aux buts pour chaque match analysé. Cela nous a permis de valider que les événements enregistrés dans les données reflètent bien la réalité des situations de jeu.
 
-Après cette analyse minutieuse, nous n'avons pas détecté d'anomalies majeures dans les données. Les coordonnées semblaient correctes, les types de tirs étaient cohérents, et les événements étaient en accord avec le contexte des clips vidéo consultés. Cependant, en analysant plus de parties, potentiellement nous aurions pu trouver des anomalies. 
+Après cette analyse minutieuse, nous avons détecté une anomalie. En effet, James van Riemsdyk n'a pas marqué son but comme sous-entendent les coordonnées de l'API (dernière ligne de l'image). En effet en allant à 3:10 minutes de cette vidéo, du côté droit de la patinoire et non du côté gauche comme sous-entendu par la valeur de l'API. 
+
+![Anomalie](/assets/images/milestone2/anomalie.png)
+
+Lien vers la vidéo: https://www.youtube.com/watch?v=liPQYJVSXpw&start=190
+
+Probablement que nous aurons trouvé d'autres situations similaires, mais cela demande une couverture d'analyse beaucoup plus grande! 
 
 # Modèles de base
 
