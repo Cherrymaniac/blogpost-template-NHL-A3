@@ -108,18 +108,18 @@ Probablement que nous aurons trouvé d'autres situations similaires, mais cela d
 # Modèles de base
 
 
-![Matrice de confusion du modèle de regression logistique sur la caractéristique distance](/assets/images/confusion_matrix_logreg_dist.png)
+![Matrice de confusion du modèle de regression logistique sur la caractéristique distance](/assets/images/milestone2/confusion_matrix_logreg_dist.png)
 
-![Expression du déséquilibre des classes](/assets/images/class_distribution.png)
+![Expression du déséquilibre des classes](/assets/images/milestone2/class_distribution.png)
 
 
-![La courbe ROC](/assets/images/roc_curve.png)
+![La courbe ROC](/assets/images/milestone2/roc_curve.png)
 
-![Le taux de buts](/assets/images/goal_rate_plot.png)
+![Le taux de buts](/assets/images/milestone2/goal_rate_plot.png)
 
-![La proportion cumulée de buts](/assets/images/cum_rate_plot.png)
+![La proportion cumulée de buts](/assets/images/milestone2/cum_rate_plot.png)
 
-![Le diagramme de fiabilité](/assets/images/calibration_curve.png)
+![Le diagramme de fiabilité](/assets/images/milestone2/calibration_curve.png)
 
 
 
