@@ -106,9 +106,11 @@ Lien vers la vidéo: https://www.youtube.com/watch?v=liPQYJVSXpw&start=190
 Probablement que nous aurons trouvé d'autres situations similaires, mais cela demande une couverture d'analyse beaucoup plus grande! 
 
 # Modèles de base
-
+En utilisant uniquement la caractéristique distance pour évaluer notre modèle de base de regression logistique,on remarque que le modèle à parfaitement prédire les cas dans lesquels il n'y a pas de but.Mais pour les cas avec but, il échoue à systématiquement.Tel que le présente la figure ci-dessous.
 
 ![Matrice de confusion du modèle de regression logistique sur la caractéristique distance](/assets/images/milestone2/confusion_matrix_logreg_dist.png)
+La raison de cette disparité deans les performances du modèle pour prédire les deux est tout d'abord dû au déséquilibre dans la répartition des données des classes.En effet, tel que le montre la figure ci-dessous, le ratio entre les données de la classe 0 (no goal) et de la classe 1 (goal) est quasiment de 10 en faveur de classe 0. Cet état de fait entraine des biais dans le modèele lors de l'entrainement.
+La seconde raison est la fait d'utiliser une seule caractéristique pour entrainer le modèle.Car en utilisant une seule caractéristique,le modèle aura moins de matière pour aller chercher les informations sous-jacentes dans les données.
 
 ![Expression du déséquilibre des classes](/assets/images/milestone2/class_distribution.png)
 
