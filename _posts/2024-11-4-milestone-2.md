@@ -904,6 +904,8 @@ Cette approche détaillée et nuancée nous a permis de construire un modèle pr
 
 ## Q6_KNN (K-Nearest Neighbors)
 
+**Lien vers le run:** https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/b1n377fy?
+
 Voici les graphiques obtenus pour le modèle KNN:
 ![ROC CURVE KNN](/assets/images/milestone2/roc_curve_KNN.png)
 La courbe indique une AUC d’environ 0.65, ce qui reflète une capacité modérée du modèle à distinguer les classes positives et négatives. Ce score est nettement inférieur à celui obtenu avec SHAP (0.75) et démontre que ce modèle est moins performant que les approches précédentes.
@@ -922,7 +924,7 @@ numeric_transformer = Pipeline(steps=[
     ('scaler', StandardScaler())
 ])
 ```
-# Modèle et paramètres spécifiques à KNN
+## Modèle et paramètres spécifiques à KNN
 
 Le modèle KNN, contrairement à Random Forest, repose fortement sur le choix de l'hyperparamètre `k` (nombre de voisins) et de la métrique de distance. Voici les hyperparamètres explorés :
 
@@ -945,30 +947,30 @@ param_grid = {
     'classifier__leaf_size': [20, 30, 40]
 }
 ```
-# Tests du nombre de voisins (k)
+## Tests du nombre de voisins (k)
 Nous avons exploré les performances du modèle en fonction du nombre de voisins (`k`).
 
  Les résultats ont montré que :
 !["KNN performance selon le nombre de voisins"](/assets/images/milestone2/KNN_per_neighbors.png)
 À partir du graphique, nous pouvons observer que le modèle KNN a des difficultés à gérer un **déséquilibre des classes**, ce qui affecte ses performances selon les différentes métriques :
 
-## Accuracy
+### Accuracy
 - L'accuracy reste stable autour de **0.8**, mais cette métrique peut être trompeuse en cas de déséquilibre des classes.
-## Precision (Précision positive)
+### Precision (Précision positive)
 - La précision est relativement **basse**, autour de **0.2 à 0.3**, ce qui indique que le modèle génère un nombre important de **faux positifs**.
 - Cela indique que le modèle a du mal à identifier correctement les échantillons appartenant à la classe minoritaire.
-## Recall (Rappel)
+### Recall (Rappel)
 - Le rappel est très variable, oscillant fortement en fonction de `k`, ce qui souligne une dépendance importante au choix du nombre de voisins.
 - Cela montre que la capacité du modèle à détecter les échantillons de la **classe minoritaire** dépend fortement du **nombre de voisins (k)**.
 - Cette instabilité est un signe supplémentaire des difficultés du modèle à gérer le déséquilibre des classes.
 
-## ROC AUC (Aire sous la courbe ROC)
+### ROC AUC (Aire sous la courbe ROC)
 - La courbe **ROC AUC** monte légèrement avec l'augmentation de `k`, puis se stabilise autour de **0.7**.
 - Bien que cette valeur indique une capacité modérée du modèle à distinguer les classes, elle reste limitée par le déséquilibre des classes.
 
-### Q6_MLP (Multi layer perceptron)
+## Q6_MLP (Multi layer perceptron)
 
-## Préparation des données
+### Préparation des données
 Nous avons utilisé un ensemble de données comportant des informations sur les tirs, telles que la distance du tir, l'angle, les coordonnées, et d'autres variables contextuelles comme le type d'événement précédent et le temps écoulé depuis cet événement.
 
 Les données ont été nettoyées et transformées comme suit :
@@ -977,13 +979,13 @@ Conversion des colonnes temporelles en secondes.
 Encodage des variables catégoriques (lastEventType, shotType) en utilisant leur fréquence relative dans l'ensemble de données.
 Imputation des valeurs manquantes avec des stratégies adaptées : moyenne pour les colonnes numériques et valeur la plus fréquente pour les colonnes catégoriques.
 
-## Équilibrage des classes
+### Équilibrage des classes
 Pour traiter le problème de déséquilibre entre les classes :
 Nous avons procéder tout d'abord par Suréchantillonnage SMOTE : la classe minoritaire a été augmentée pour représenter 20 % de la classe majoritaire.
 Puis par un Sous-échantillonnage aléatoire : les classes majoritaires ont été réduites pour équilibrer les proportions.
 Ces techniques garantissent que le modèle ne privilégie pas systématiquement la classe majoritaire.
 
-## Construction du modèle
+### Construction du modèle
 Pipeline de traitement
 Nous avons conçu un pipeline modulaire permettant de combiner :
 
@@ -1082,6 +1084,8 @@ La calibration des modèles dans les séries éliminatoires révèle que XGBoost
 
 La proportion cumulée des buts montre une tendance similaire à celle de la saison régulière, avec XGBoost en tête, suivi des modèles logreg_comb et logreg_dist. Ces derniers montrent une capacité à suivre les performances de XGBoost de manière satisfaisante. MLP et logreg_ang présentent une performance inférieure, avec une difficulté à capturer efficacement les buts cumulés.
 
-Les résultats pour les séries éliminatoires confirment une légère baisse des performances globales des modèles par rapport à la saison régulière, probablement en raison des différences dans les données des séries. En effet, les séries accueillent un nombre exclusif d'équipes voulant dire que les patterns que nous avons appris dans les données d'entraînement ne s'appliquement pas entièrement à ces matchs. Aussi, en séries éliminatoires les équipes changent leurs stratégies de jeux ce qui peut mener à beaucoup de scénarois différents de buts qu'on a jamais vus auparavant. Le modèle XGBoost reste le plus performant et robuste, suivi de près par logreg_comb et logreg_dist. Le MLP, bien qu'étant un modèle plus complexe, continue de décevoir en termes de généralisation, particulièrement dans des contextes comme les séries où les données peuvent être moins prévisibles.
+Les résultats pour les séries éliminatoires confirment une légère baisse des performances globales des modèles par rapport à la saison régulière, probablement en raison des différences dans les données des séries. En effet, les séries accueillent un nombre exclusif d'équipes voulant dire que les patterns que nous avons appris dans les données d'entraînement ne s'appliquement pas entièrement à ces matchs. Aussi, en séries éliminatoires les équipes changent leurs stratégies de jeux ce qui peut mener à beaucoup de scénarois différents de buts qu'on a jamais vus auparavant. Un autre facteur pouvant mener à cette différence, est l'état mental des joueurs. En effet, on remarque un stress accru en séries éliminatoires ce qui peut grandement affecter la qualité des tirs ou même les performances des joueurs et gardiens. 
+
+En conclusion, le modèle XGBoost avec SHAP reste le plus performant et robuste, suivi de près par logreg_comb et logreg_dist. Le MLP, bien qu'étant un modèle plus complexe, continue de décevoir en termes de généralisation, particulièrement dans des contextes comme les séries où les données peuvent être moins prévisibles.
 
 **Lien du run de test:** https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/kkfh7fyo?
