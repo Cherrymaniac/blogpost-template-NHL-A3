@@ -128,15 +128,13 @@ Probablement que nous aurons trouvé d'autres situations similaires, mais cela d
 
 # Ingénierie des Caractéristiques II
 
-Le code intègre déjà plusieurs caractéristiques pertinenntes issues des donnéees dispoinibles. En effet celui-ci peut se retrouver dans le fichier ```feature_engineering.py``` sous l'onglet ```src``` de notre repository.
+Dans cette section, nous allons caractéristiques pertinentes issues des donnéees dispoinibles. En effet celui-ci peut se retrouver dans le fichier ```feature_engineering.py``` sous l'onglet ```src``` de notre repository.
 
-**Caractéristiques à inclure à partir des données existantes: **
-
-Commençons d'abord avec des caractéristiques de base.
+## Caractéristiques à inclure à partir des données existantes
 
 1. Secondes de jeu (Game seconds):
   - **Colonne créée** : ```gameSeconds```
-  - **Explication** : Nombre total de secondes écoulées dans le match depuis le début, calculé à partir de la période et de l’heure de l’événement avec la fonction ```add_game_seconds()```.
+  - **Explication** : Nombre total de secondes écoulées dans le match depuis le début, calculé à partir de la période et du temps écoulé avec la fonction ```add_game_seconds()```.
   - **Code** : 
      ```python
     def add_game_seconds(self):
@@ -160,11 +158,11 @@ Commençons d'abord avec des caractéristiques de base.
 
 3. Coordonnées (x, y): 
   - **Colonnes créées** : ```xCoord``` et  ```yCoord```
-  - **Explication** : Coordonnées exactes du tir sur la glace, extraites des données brutes par ```calculate_shot_distance_and_angle()```
+  - **Explication** : Coordonnées exactes du tir sur la glace, extraites des données brutes par ```calculate_shot_distance_and_angle()```.
 
 4. Distance du tir (Shot distance) :
   - **Colonne créée** : ```shotDistance```
-  - **Explication** : Distance euclidienne en mètres entre la position du tir et le filet, calculée dans ```calculate_shot_distance_and_angle()```
+  - **Explication** : Distance euclidienne en mètres entre la position du tir et le filet, calculée dans ```calculate_shot_distance_and_angle()```.
 
 5. Type de tir (Shot type) :
   - **Colonne existante** : ```shotType```
@@ -221,7 +219,7 @@ Commençons d'abord avec des caractéristiques de base.
           self.df[['xCoord', 'yCoord', 'shotDistance', 'shotAngle']] = self.df.apply(lambda row: pd.Series(get_distance_and_angle(row)), axis=1)
     ```
 
-**Ajout des informations sur l’événement précédent:**
+## Ajout des informations sur l’événement précédent
 
 Le code inclut aussi des méthodes dédiées pour enrichir chaque évènement avec des informations sur l'évènement précédent. 
 
@@ -344,21 +342,21 @@ Le code inclut aussi des méthodes dédiées pour enrichir chaque évènement av
             self.df['distanceFromLastEvent'] = distance_from_last_event
         ```
 
-**Caractéristiques supplémentaires:**
+## Caractéristiques supplémentaires
 
 Trois nouvelles caractéristiques basées sur l'état du jeu et les événements précédents sont également calculées :
 
 1. Rebond (Rebound):
   - **Colonne créée**: ```rebound```
-  - **Explication**: Indique si l’événement précédent était un tir, ce qui pourrait signaler un rebond, calculé dans ```previous_event_analysis()```
+  - **Explication**: Indique si l’événement précédent était un tir, ce qui pourrait signaler un rebond, calculé dans ```previous_event_analysis()```. Ceci est une valeur booléenne.
 
 2. Changement d'angle du tir (Change in shot angle) :
   - **Colonne créée**: ```changeInShotAngle```
-  - **Explication**: Différence entre l’angle du tir actuel et celui du tir précédent (ceci est calculé uniquement pour les rebonds). Ceci est calculé dans la méthode ```previous_event_analysis()```.
+  - **Explication**: Différence entre l’angle du tir actuel et celui du tir précédent (calculé uniquement pour les rebonds). Ceci est calculé par la méthode ```previous_event_analysis()```.
 
 3. Vitesse (Speed):
   - **Colonne créée** : speed
-  - **Explication**: Vitesse en mètres par seconde depuis le dernier évènement. Distance parcourue entre l’événement précédent et l’événement actuel, divisée par le temps écoulé. Ceci est aussi calculé dans la méthode ```previous_event_analysis()```.
+  - **Explication**: Vitesse en mètres par seconde depuis le dernier évènement. Distance parcourue entre l’événement précédent et l’événement actuel, divisée par le temps écoulé. Ceci est aussi calculé par la méthode ```previous_event_analysis()```.
   - **Code**:
       ```python
         def previous_event_analysis(self):
@@ -423,7 +421,7 @@ Trois nouvelles caractéristiques basées sur l'état du jeu et les événements
             self.df['speed'] = speeds   
         ```
 
-**Création de caractéristiques personnalisées**:
+## Création de caractéristiques personnalisées 
 
 Nous avons aussi créé des caractéristiques personalisées pour nous aider dans notre traitement de données.
 
@@ -488,7 +486,7 @@ Nous avons aussi créé des caractéristiques personalisées pour nous aider dan
 
 4. Côté Offensive (Offensive Side):
   - **Colonne créée**: ```offensiveSide```
-  - **Explication**: Côté offensif (droite ou gauche) de l'équipe en train de tirer.
+  - **Explication**: Côté offensif (droite ou gauche) sur la patinoire de l'équipe en train de tirer. Celui-ci change pour les deux équipes à chaque période.
   - **Code**:
       ```python 
         def determine_offensive_side(self):
@@ -564,7 +562,7 @@ Nous avons aussi créé des caractéristiques personalisées pour nous aider dan
               self.df.loc[self.df['gameId'] == game_id, 'offensiveSide'] = self.df[self.df['gameId'] == game_id].apply(get_offensive_side, axis=1)
       ```
 
-**Création et soumission d'un sous-ensemble de données**: 
+## Création et soumission d'un sous-ensemble de données**
 
 Le code fournit une méthode ```log_filtered_dataframe()``` pour : 
 - Filtrer les données par ID de match (ex. : Winnipeg vs Washington, gameId = 2017021065).
