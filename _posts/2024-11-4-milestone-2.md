@@ -968,6 +968,8 @@ Nous avons exploré les performances du modèle en fonction du nombre de voisins
 - La courbe **ROC AUC** monte légèrement avec l'augmentation de `k`, puis se stabilise autour de **0.7**.
 - Bien que cette valeur indique une capacité modérée du modèle à distinguer les classes, elle reste limitée par le déséquilibre des classes.
 
+Le KNN montre une forte sensibilité au déséquilibre des classes, se traduisant par une précision faible et un recall instable. Bien que l'accuracy et le ROC AUC soient relativement stables, ils ne suffisent pas à compenser les lacunes du modèle sur la classe minoritaire. En résumé, bien que le sous-échantillonnage ait aidé à équilibrer les données, KNN semble limité pour ce problème en raison de sa forte dépendance à la densité locale des données.
+
 ## Q6_MLP (Multi layer perceptron)
 
 ### Préparation des données
@@ -1032,10 +1034,8 @@ parameter_space = {
 
 
 ### Conclusion
-Le KNN montre une forte sensibilité au déséquilibre des classes, se traduisant par une précision faible et un recall instable. Bien que l'accuracy et le ROC AUC soient relativement stables, ils ne suffisent pas à compenser les lacunes du modèle sur la classe minoritaire.
-En résumé, bien que le sous-échantillonnage ait aidé à équilibrer les données, KNN semble limité pour ce problème en raison de sa forte dépendance à la densité locale des données.
-**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/b1n377fy.
-**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/tw7yrhh8.
+
+
 
 
 # Évaluer sur l'ensemble de test
