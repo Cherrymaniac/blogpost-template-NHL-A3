@@ -711,7 +711,15 @@ Par rapport aux autres modèles testés, l’approche utilisant SHAP s’est av�
 Voici le lien de notre meilleur modèle de la famille XGBoost: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/vje687th
 
 ## Q6_Random_forest
-
+Voici les graphiques obtenus pour le modèle RandomForest:
+![ROC CURVE RF](/assets/images/milestone2/roc_curve_RF.png)
+La courbe ROC montre une performance globale acceptable avec une aire sous la courbe (AUC) autour de 0,73. Cela indique que le modèle est capable de discriminer correctement entre les classes positives et négatives dans environ 73 % des cas, mais reste inférieur aux modèles optimisés comme SHAP.
+![Goal Rate RF](/assets/images/milestone2/GoalRateCurve_RF.png)
+La courbe "Goal Rate" montre une chute rapide du taux de buts dans les percentiles les plus élevés. Les shots avec une probabilité élevée (percentiles supérieurs) sont significativement plus précis, mais la courbe descend de façon progressive, suggérant une corrélation modérée entre les probabilités prédites et les buts réels.
+![Proportion Cumulee RF](/assets/images/milestone2/CumulativeGoalRate_RF.png)
+La courbe cumulative montre une bonne couverture des buts dans les percentiles supérieurs, atteignant environ 80 % des buts avec les 50 % les plus probables. Cela reflète que le modèle capture bien les événements les plus probables, mais avec une précision légèrement inférieure par rapport à d'autres approches.
+![Calibration Curve RF](/assets/images/milestone2/Calibration_Curve_RF.png)
+La courbe de calibration montre que les probabilités prédites sont légèrement sous-calibrées pour les faibles probabilités et deviennent plus alignées avec les observations pour des probabilités élevées. Cependant, des ajustements pourraient encore améliorer l'alignement, notamment pour les bins intermédiaires.
 ### Prétraitement des données
 Nous avons commencé par traiter les données pour garantir leur qualité et leur pertinence. Pour les colonnes catégorielles avec de nombreuses valeurs distinctes, nous avons utilisé un encodage de fréquence pour transformer chaque catégorie en une proportion au sein du jeu de données. Pour les colonnes binaires, nous avons appliqué un encodage one-hot, ce qui facilite leur interprétation par le modèle. Les données numériques manquantes ont été imputées en remplaçant les valeurs manquantes par la médiane de chaque colonne
 #### Colonnes spécifiques et transformations
@@ -846,10 +854,19 @@ def custom_scorer(y_true, y_pred_proba, beta=1.0):
 ```
 
 Cette approche détaillée et nuancée nous a permis de construire un modèle prédictif avec un score ROC_AUC de 0.77,un recall de 60% et une précision assez basse de 22%. Pour améliorer le modèle, l'ajout de nouvelle features semble nécessaire.
-**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/f51qyw2h
+**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/d45pn2k2
 # Modèles avancés
 ## Q6_KNN (K-Nearest Neighbors)
 
+Voici les graphiques obtenus pour le modèle KNN:
+![ROC CURVE KNN](/assets/images/milestone2/roc_curve_KNN.png)
+La courbe indique une AUC d’environ 0.65, ce qui reflète une capacité modérée du modèle à distinguer les classes positives et négatives. Ce score est nettement inférieur à celui obtenu avec SHAP (0.75) et démontre que ce modèle est moins performant que les approches précédentes.
+![Goal Rate KNN](/assets/images/milestone2/GoalRateCurve_KNN.png)
+Le modèle montre un taux de conversion élevé pour les tirs dans les percentiles supérieurs, atteignant près de 40 % pour les tirs les mieux classés. Cependant, le taux chute rapidement pour les autres percentiles, suggérant que le modèle a des difficultés à bien classifier les tirs ayant des probabilités moyennes.
+![Proportion Cumulee KNN](/assets/images/milestone2/CumulativeGoalRate_KNN.png)
+La courbe montre que les 20 % des meilleurs percentiles capturent environ 70 % des buts, un résultat correct mais inférieur comparé aux modèles optimisés précédemment, où une meilleure couverture des buts était atteinte avec les percentiles supérieurs.
+![Calibration Curve KNN](/assets/images/milestone2/Calibration%20Curve_KNN.png)
+Les prédictions ne sont pas bien calibrées. Par exemple, pour une probabilité moyenne prédite de 0.6, la fraction de vrais positifs est souvent surestimée. Cette mauvaise calibration reflète un écart significatif entre les scores du modèle et la réalité observée, ce qui limite son utilité pour des décisions basées sur des probabilités. 
 ### Prétraitement des données
 Les principales différences dans le prétraitement pour KNN incluent :
 - **Standardisation des caractéristiques numériques** :
@@ -905,4 +922,4 @@ Nous avons exploré les performances du modèle en fonction du nombre de voisins
 ### Conclusion
 Le KNN montre une forte sensibilité au déséquilibre des classes, se traduisant par une précision faible et un recall instable. Bien que l'accuracy et le ROC AUC soient relativement stables, ils ne suffisent pas à compenser les lacunes du modèle sur la classe minoritaire.
 En résumé, bien que le sous-échantillonnage ait aidé à équilibrer les données, KNN semble limité pour ce problème en raison de sa forte dépendance à la densité locale des données.
-**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/tw7yrhh8.
+**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/b1n377fy.
