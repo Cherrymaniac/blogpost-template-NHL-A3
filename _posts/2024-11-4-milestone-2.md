@@ -91,8 +91,13 @@ Pour les tirs sur un filet Vide voici les observatinos clés:
 
 L’analyse montre des différences importantes entre les buts marqués sur filet vide et ceux sur filet non-vide. Les buts sur filet non-vide sont souvent dus à des tirs précis ou des actions rapprochées où le gardien est mis sous pression. En revanche, les filets vides permettent des tirs plus risqués et éloignés, souvent tentés depuis des positions inhabituelles. Ces résultats mettent en évidence l’influence des situations de jeu sur les opportunités de marquer et soulignent l’importance de traiter ces cas différemment dans l’analyse des buts attendus, pour mieux refléter les choix tactiques en fin de match.
 
-**IL RESTE A PROUVER LE DERNIER POINT DE CETTE SECTION** 
-<<<<<<< Updated upstream
+Nous avons procédé à une analyse approfondie des données pour détecter d’éventuelles anomalies. Pour cela, nous avons divisé la tâche entre les trois membres de l'équipe, chacun examinant 30 matchs pour un total de 90 matchs analysés. Durant cette analyse, nous avons vérifié attentivement les coordonnées (x, y), les types de tirs, et les autres caractéristiques associées aux événements.
+
+De plus, nous avons utilisé le GameCenter de la LNH pour confirmer nos observations en visionnant les clips vidéo correspondants aux buts pour chaque match analysé. Cela nous a permis de valider que les événements enregistrés dans les données reflètent bien la réalité des situations de jeu.
+
+Après cette analyse minutieuse, nous n'avons pas détecté d'anomalies majeures dans les données. Les coordonnées semblaient correctes, les types de tirs étaient cohérents, et les événements étaient en accord avec le contexte des clips vidéo consultés. Cependant, en analysant plus de parties, potentiellement nous aurions pu trouver des anomalies. 
+
+# Modèles de base
 
 # Ingénierie des Caractéristiques II
 
@@ -587,9 +592,8 @@ Le code fournit une méthode ```log_filtered_dataframe()``` pour :
 
     Ce lien contient notre artifact des données filtrées pour le match de Winnipeg vs Washington qui s'est déroulé le 12 mars 2018. 
 
-# Modèles de base
-
 # Modèles avancés
+
 Pour répondre au point 1 de cette section, nous avons entraîné un classificateur XGBoost en utilisant uniquement les caractéristiques de ```distance``` et d'```angle```. L'objectif de cette expérience était de comparer les performances de ce modèle avec la ligne de base établie dans la partie précédente à l'aide de la régression logistique. La configuration de l'entraînement a été réalisée avec une division 80/20 des données d'entraînement et de validation. Aucun réglage des hyperparamètres n'a été effectué à ce stade, le modèle XGBoost ayant été utilisé avec des paramètres par défaut.
 
 Voici les graphiques obtenus pour ce premier modèle:
@@ -709,6 +713,8 @@ Le graphique montre que le modèle est bien calibré pour des probabilités faib
 Par rapport aux autres modèles testés, l’approche utilisant SHAP s’est avérée être la meilleure grâce à sa capacité à identifier les caractéristiques les plus pertinentes tout en améliorant la performance globale. Avec une AUC de 0.75, SHAP dépasse le modèle de base (AUC de 0.72) et les modèles optimisés par validation croisée, tout en simplifiant les données d’entrée en sélectionnant seulement 10 caractéristiques clés comme shotDistance, yCoord et shotType. Contrairement à SelectKBest, qui sélectionne des caractéristiques sans interprétation, SHAP offre une transparence unique en attribuant une importance précise à chaque caractéristique pour chaque prédiction, ce qui améliore l’interprétabilité et la robustesse du modèle. De plus, la calibration du modèle SHAP est bien ajustée, réduisant les biais observés dans les autres approches.
 
 Voici le lien de notre meilleur modèle de la famille XGBoost: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/vje687th
+
+# Faites de votre mieux!
 
 ## Q6_Random_forest
 Voici les graphiques obtenus pour le modèle RandomForest:
