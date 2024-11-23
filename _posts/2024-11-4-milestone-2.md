@@ -710,13 +710,10 @@ Par rapport aux autres modèles testés, l’approche utilisant SHAP s’est av�
 
 Voici le lien de notre meilleur modèle de la famille XGBoost: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/vje687th
 
-# Expérience No. 2
-
-## Entrée du journal : Q6_Random_forest
+## Q6_Random_forest
 
 ### Prétraitement des données
-Nous avons commencé par traiter les données pour garantir leur qualité et leur pertinence. Pour les colonnes catégorielles avec beaucoup de valeurs, nous avons utilisé un encodage de fréquence pour transformer les catégories en leur proportion dans le jeu de données. Ensuite, nous avons effectué un encodage one-hot pour les valeurs binaires, facilitant ainsi leur interprétation par le modèle.
-Pour les données numériques manquantes, nous avons appliqué une imputation simple pour remplacer les valeurs manquantes par la médiane de chaque colonne.
+Nous avons commencé par traiter les données pour garantir leur qualité et leur pertinence. Pour les colonnes catégorielles avec de nombreuses valeurs distinctes, nous avons utilisé un encodage de fréquence pour transformer chaque catégorie en une proportion au sein du jeu de données. Pour les colonnes binaires, nous avons appliqué un encodage one-hot, ce qui facilite leur interprétation par le modèle. Les données numériques manquantes ont été imputées en remplaçant les valeurs manquantes par la médiane de chaque colonne
 #### Colonnes spécifiques et transformations
 
 - **shotType** :
@@ -729,8 +726,46 @@ Pour les données numériques manquantes, nous avons appliqué une imputation si
   - Utilisation de l'encodage one-hot avec `drop='first'` pour éviter la multicolinéarité. Cela crée des variables binaires pour chaque catégorie, en éliminant une catégorie de référence.
 
 - **shooter** :
-Le taux de réussite d'un joueur face à un goal est une valeur clé pour déterminer si un tir va réussir ou non. Nous avons utilisé un encodage cible avec lissage pour éviter le surapprentissage. Un encodage cible personnalisé (PlayerTargetEncoder) a été développé pour calculer un taux de réussite lissé pour chaque joueur.
-```python ```
+Le taux de réussite d’un joueur face à un gardien est une caractéristique clé pour déterminer si un tir va réussir ou non. Nous avons utilisé un encodage cible avec lissage pour éviter le surapprentissage. Nous avons développé un encodage cible personnalisé (PlayerTargetEncoder) pour calculer un taux de réussite lissé pour chaque joueur.
+```python
+class PlayerTargetEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self, smoothing=10):
+        self.smoothing = smoothing
+        self.player_stats = {}
+        self.global_mean = None
+
+    def fit(self, X, y):
+        if isinstance(X, pd.DataFrame):
+            # Gestion des colonnes pour les tireurs et les gardiens
+            for column in X.columns:
+                self.player_stats[column] = {}
+                
+                player_counts = X[column].value_counts()
+                # Calcul de la moyenne globale pour ce type de joueur
+                self.global_mean = np.mean(y)
+                
+                for player in player_counts.index:
+                    mask = (X[column] == player)
+                    shots = np.sum(mask)
+                    goals = np.sum(y[mask])
+                    
+                    # Taux de réussite lissé
+                    smoothed_rate = (goals + self.smoothing * self.global_mean) / (shots + self.smoothing)
+                    self.player_stats[column][player] = smoothed_rate
+        
+        return self
+
+    def transform(self, X):
+        if isinstance(X, pd.DataFrame):
+            result = np.zeros((len(X), len(X.columns)))
+            
+            for idx, column in enumerate(X.columns):
+                result[:, idx] = X[column].map(self.player_stats[column]).fillna(self.global_mean)
+            
+            return result
+        
+        return X.map(self.player_stats).fillna(self.global_mean).to_numpy().reshape(-1, 1)
+ ```
 
 - **Caractéristiques numériques** (`shotDistance`, `shotAngle`, etc.) :
 Le modèle Random Forest n'a pas besoin de standardisation ou de normalisation; nous avons donc décidé de conserver les valeurs originales en utilisant la méthode 'passthrough', permettant ainsi au modèle d'interpréter directement ces valeurs.
@@ -743,29 +778,28 @@ Le modèle Random Forest n'a pas besoin de standardisation ou de normalisation; 
 #### Sous-échantillonnage
 
 Nous avons décidé d'utiliser le sous-échantillonnage après avoir essayé le suréchantillonnage et une combinaison des deux, car le sous-échantillonnage a donné de meilleurs résultats. Ceci était crucial en raison du déséquilibre significatif entre le nombre de tirs et de buts (ratio de 10:1). Sans sous-échantillonnage, le modèle avait tendance à prédire majoritairement des zéros plutôt que des uns.
--Nous avons utilisé RandomUnderSampler avec un ratio de 0.35 pour rééquilibrer les classes et réduire la surreprésentation d'une catégorie. Ce ratio a été choisi après avoir tracé plusieurs métriques (accuracy, recall, precision, F1, ROC AUC) en testant différents taux d'échantillonnage pour observer l'évolution de ces métriques avec l'échantillonnage.
-
-!["Evolution des differentes metriques selon le taux d'Undersampling"](/assets/images/SamplingStrategy.png)
+Un RandomUnderSampler avec un ratio de 0.4 a été utilisé pour rééquilibrer les classes et réduire la surreprésentation de la classe majoritaire. Ce ratio a été déterminé après avoir évalué plusieurs métriques (accuracy, recall, precision, F1, ROC AUC) sur différents taux d'échantillonnage, afin d'observer leur évolution.
+!["Evolution des differentes metriques selon le taux d'Undersampling"](/assets/images/milestone2/SamplingStrategy.png)
 #### Imputation
 - Pour les colonnes numériques comme `speed` et `distanceFromLastEvent`, nous avons utilisé la médiane pour remplacer les valeurs manquantes par des valeurs contextuellement pertinentes.
--Nous avons egalement drop changeinShotAngle car trop de valeurs manquantes.
+- Nous avons également drop changeinShotAngle car trop de valeurs manquantes.
 ### Caractéristiques dérivées
+
 Nous avons créé plusieurs caractéristiques dérivées pour enrichir notre modèle :
--shots_period_cumsum : Nombre cumulatif de tirs par période et par équipe.
--cumulative_possession_time : Temps de possession cumulatif. L'idée derrière cette caractéristique est que l'équipe ayant le plus de possession contrôle davantage le jeu et a donc plus de chances de marquer.
--time_since_last_shot : Temps écoulé depuis le dernier tir. Plusieurs tirs consécutifs ont plus de chances de se traduire par un but.
--consecutive_penalties : Nombre consécutif de pénalités. Plus une équipe accumule de pénalités, plus elle est désavantagée, ce qui facilite les opportunités de tir pour l'équipe adverse.
--score_differential : Différence de score au moment du tir, en excluant évidemment le tir en question pour éviter tout data leakage. Cette caractéristique a été calculée en cumulant le score puis en appliquant un décalage d'une ligne (shift).
+- `shots_period_cumsum` : Nombre cumulatif de tirs par période et par équipe.
+- `cumulative_possession_time` : Temps de possession cumulatif. L'idée derrière cette caractéristique est que l'équipe ayant le plus de possession contrôle davantage le jeu et a donc plus de chances de marquer.
+- `time_since_last_shot` : Temps écoulé depuis le dernier tir. Plusieurs tirs consécutifs ont plus de chances de se traduire par un but.
+- `consecutive_penalties` : Nombre consécutif de pénalités. Plus une équipe accumule de pénalités, plus elle est désavantagée, ce qui facilite les opportunités de tir pour l'équipe adverse.
+- `score_differential` : Différence de score au moment du tir, en excluant le tir en question pour éviter tout problème de fuite de données (data leakage). Cette caractéristique a été calculée en cumulant le score puis en appliquant un décalage d'une ligne (shift).
 Comme nous pouvons le voir sur l'histogramme ci-dessous: 
-!["Top 20 des caracteristiques les plus importantes"](/assets/images/Top20Carac.png)
--Les valeurs ayant le plus d'impact sur la décision de l'arbre sont la distance(plus un joueur est proche du but, plus ses chances de marquer sont bonnes), la coordonnée y, et si le but est vide.
--Parmi les nouvelles caractéristiques, seule shooter a eu un impact notable sur les performances(un meilleur joueur a plus de chance de marquer), time_since_last_shot a aussi un impact équivalent à l'angle du tir. Nous avons également essayé d'ajouter des caractéristiques basées sur le taux de victoire/défaite/nuls au cours de la saison, mais cela n'a pas eu d'influence significative sur le modèle. 
+!["Top 20 des caracteristiques les plus importantes"](/assets/images/milestone2/Top20Carac.png)
+- Comme le montre l'histogramme, les variables ayant le plus d'impact sur la décision de l'arbre incluent : la distance au but (plus un joueur est proche du but, plus ses chances de marquer augmentent), la coordonnée y, et l'état du but (vide ou non).
+- Parmi les nouvelles caractéristiques, seule shooter a eu un impact notable sur les performances(un meilleur joueur a plus de chance de marquer), time_since_last_shot a aussi un impact équivalent à l'angle du tir. Nous avons également essayé d'ajouter des caractéristiques basées sur le taux de victoire/défaite/nuls au cours de la saison, mais cela n'a pas eu d'influence significative sur le modèle. 
 ### Pondération des classes
 
 Pour le `RandomForestClassifier`, nous avons attribué un poids différent à chaque classe, trouvant qu'un poids de 1:2 était optimal :
-
-- Classe 0 (non-but) : Poids 1
-- Classe 1 (but) : Poids 2
+  - Classe 0 (non-but) : Poids 1
+  - Classe 1 (but) : Poids 2
 
 Cela permet de donner plus d'importance aux événements de but, rares mais cruciaux.
 
@@ -787,12 +821,12 @@ Nous avons utilisé `RandomizedSearchCV` pour explorer :
 - Et autres paramètres de régularisation.
 
 ### Validation
-Nous avons également éssayé la validation croisée stratifiée avec `StratifiedKFold` qvec 10 splits. Ce qui a légerement amélioré la qualité du modèle.
+Nous avons également essayé la validation croisée stratifiée avec `StratifiedKFold` avec 10 splits. Ce qui a légerement amélioré la qualité du modèle.
 ```python 
 # Configuration de la validation croisée
 cv_splitter = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 ```
-Comme métrique d'évaluation, nous avons choisi score ROC_AUC. Nous avons egalement experimente avec une version personnalite du Fbeta score car la precision et le recall du modele etaient bas. 
+Comme métrique d'évaluation, nous avons choisi score ROC_AUC. Nous avons également experimenté avec une version personnalisé du Fbeta score car la precision et le recall du modèle étaient bas. 
 ```python 
 def custom_scorer(y_true, y_pred_proba, beta=1.0):
     thresholds = np.arange(0.1, 0.9, 0.05)
@@ -810,5 +844,65 @@ def custom_scorer(y_true, y_pred_proba, beta=1.0):
             
     return best_score
 ```
-Cette approche détaillée et nuancée nous a permis de construire un modèle prédictif avec un score ROC_AUC de 0.76.
 
+Cette approche détaillée et nuancée nous a permis de construire un modèle prédictif avec un score ROC_AUC de 0.77,un recall de 60% et une précision assez basse de 22%. Pour améliorer le modèle, l'ajout de nouvelle features semble nécessaire.
+**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/f51qyw2h
+# Modèles avancés
+## Q6_KNN (K-Nearest Neighbors)
+
+### Prétraitement des données
+Les principales différences dans le prétraitement pour KNN incluent :
+- **Standardisation des caractéristiques numériques** :
+  - Contrairement au Random Forest, KNN est sensible à l'échelle des données. Nous avons utilisé un StandardScaler afin de standardiser toutes les colonnes numériques(`shotDistance`, `shotAngle`, etc.), une étape cruciale pour les modèles basés sur des distances, comme KNN. 
+```python
+numeric_transformer = Pipeline(steps=[
+    ('scaler', StandardScaler())
+])
+```
+# Modèle et paramètres spécifiques à KNN
+
+Le modèle KNN, contrairement à Random Forest, repose fortement sur le choix de l'hyperparamètre `k` (nombre de voisins) et de la métrique de distance. Voici les hyperparamètres explorés :
+
+- **n_neighbors** : Nombre de voisins (k).
+- **weights** :
+  - `uniform` : Tous les voisins ont le même poids.
+  - `distance` : Les voisins proches ont plus d'impact.
+- **metric** : Métrique utilisée pour calculer les distances (`euclidienne`, `manhattan`, `minkowski`).
+- **p** :
+  - `p=1` : Distance de Manhattan.
+  - `p=2` : Distance euclidienne.
+- **leaf_size** : Paramètre influençant la recherche rapide des voisins.
+
+```python
+param_grid = {
+    'classifier__n_neighbors': [3, 5, 7, 9, 11, 13, 15],
+    'classifier__weights': ['uniform', 'distance'],
+    'classifier__metric': ['euclidean', 'manhattan', 'minkowski'],
+    'classifier__p': [1, 2],
+    'classifier__leaf_size': [20, 30, 40]
+}
+```
+# Tests du nombre de voisins (k)
+Nous avons exploré les performances du modèle en fonction du nombre de voisins (`k`).
+
+ Les résultats ont montré que :
+!["KNN performance selon le nombre de voisins"](/assets/images/milestone2/KNN_per_neighbors.png)
+À partir du graphique, nous pouvons observer que le modèle KNN a des difficultés à gérer un **déséquilibre des classes**, ce qui affecte ses performances selon les différentes métriques :
+
+## Accuracy
+- L'accuracy reste stable autour de **0.8**, mais cette métrique peut être trompeuse en cas de déséquilibre des classes.
+## Precision (Précision positive)
+- La précision est relativement **basse**, autour de **0.2 à 0.3**, ce qui indique que le modèle génère un nombre important de **faux positifs**.
+- Cela indique que le modèle a du mal à identifier correctement les échantillons appartenant à la classe minoritaire.
+## Recall (Rappel)
+- Le rappel est très variable, oscillant fortement en fonction de `k`, ce qui souligne une dépendance importante au choix du nombre de voisins.
+- Cela montre que la capacité du modèle à détecter les échantillons de la **classe minoritaire** dépend fortement du **nombre de voisins (k)**.
+- Cette instabilité est un signe supplémentaire des difficultés du modèle à gérer le déséquilibre des classes.
+
+## ROC AUC (Aire sous la courbe ROC)
+- La courbe **ROC AUC** monte légèrement avec l'augmentation de `k`, puis se stabilise autour de **0.7**.
+- Bien que cette valeur indique une capacité modérée du modèle à distinguer les classes, elle reste limitée par le déséquilibre des classes.
+### Conclusion
+Le KNN montre une forte sensibilité au déséquilibre des classes, se traduisant par une précision faible et un recall instable. Bien que l'accuracy et le ROC AUC soient relativement stables, ils ne suffisent pas à compenser les lacunes du modèle sur la classe minoritaire.
+En résumé, bien que le sous-échantillonnage ait aidé à équilibrer les données, KNN semble limité pour ce problème en raison de sa forte dépendance à la densité locale des données.
+**Lien vers le run**: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/tw7yrhh8.
