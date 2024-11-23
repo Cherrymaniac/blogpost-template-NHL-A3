@@ -99,6 +99,25 @@ Après cette analyse minutieuse, nous n'avons pas détecté d'anomalies majeures
 
 # Modèles de base
 
+
+![Matrice de confusion du modèle de regression logistique sur la caractéristique distance](/assets/images/confusion_matrix_logreg_dist.png)
+
+![Expression du déséquilibre des classes](/assets/images/class_distribution.png)
+
+
+![La courbe ROC](/assets/images/roc_curve.png)
+
+![Le taux de buts](/assets/images/goal_rate_plot.png)
+
+![La proportion cumulée de buts](/assets/images/cum_rate_plot.png)
+
+![Le diagramme de fiabilité](/assets/images/calibration_curve.png)
+
+
+
+
+
+
 # Ingénierie des Caractéristiques II
 
 Le code intègre déjà plusieurs caractéristiques pertinenntes issues des donnéees dispoinibles. En effet celui-ci peut se retrouver dans le fichier ```feature_engineering.py``` sous l'onglet ```src``` de notre repository.
@@ -929,6 +948,70 @@ Nous avons exploré les performances du modèle en fonction du nombre de voisins
 ## ROC AUC (Aire sous la courbe ROC)
 - La courbe **ROC AUC** monte légèrement avec l'augmentation de `k`, puis se stabilise autour de **0.7**.
 - Bien que cette valeur indique une capacité modérée du modèle à distinguer les classes, elle reste limitée par le déséquilibre des classes.
+
+### Q6_MLP (Multi layer perceptron)
+
+## Préparation des données
+Nous avons utilisé un ensemble de données comportant des informations sur les tirs, telles que la distance du tir, l'angle, les coordonnées, et d'autres variables contextuelles comme le type d'événement précédent et le temps écoulé depuis cet événement.
+
+Les données ont été nettoyées et transformées comme suit :
+
+Conversion des colonnes temporelles en secondes.
+Encodage des variables catégoriques (lastEventType, shotType) en utilisant leur fréquence relative dans l'ensemble de données.
+Imputation des valeurs manquantes avec des stratégies adaptées : moyenne pour les colonnes numériques et valeur la plus fréquente pour les colonnes catégoriques.
+
+## Équilibrage des classes
+Pour traiter le problème de déséquilibre entre les classes :
+Nous avons procéder tout d'abord par Suréchantillonnage SMOTE : la classe minoritaire a été augmentée pour représenter 20 % de la classe majoritaire.
+Puis par un Sous-échantillonnage aléatoire : les classes majoritaires ont été réduites pour équilibrer les proportions.
+Ces techniques garantissent que le modèle ne privilégie pas systématiquement la classe majoritaire.
+
+## Construction du modèle
+Pipeline de traitement
+Nous avons conçu un pipeline modulaire permettant de combiner :
+
+- La prétraitement des données (scalage, encodage).
+- La sélection de caractéristiques (avec SelectFromModel basé sur un LinearSVC).
+- La classification avec un MLP.
+- Architecture du modèle
+- Le MLP est paramétré avec les hyperparamètres suivants :
+
+```python
+ def pipeline(classifier,feature_selection,encoder):
+
+    enc = {
+        'Label': OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1),
+        'OneHot': OneHotEncoder(handle_unknown='ignore')
+    }
+    numeric_transformer = Pipeline([('Impt', SimpleImputer(strategy='mean')),('scaler', StandardScaler()),]) #Scaling of numerical col.
+    categorical_transformer = Pipeline([('Impt', SimpleImputer(strategy='most_frequent')),('encoder', enc[encoder]),]) #Encoding of categorical col.  
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ("Numerical_transform", numeric_transformer, make_column_selector(dtype_include="number")),
+            ("Categorical_transform", categorical_transformer, make_column_selector(dtype_exclude="number")),
+        ]
+    )  
+    return Pipeline(steps=[('preprocessor', preprocessor)] + [('feature_select', feature_selection)] + [('classifier', classifier)])
+
+classifer=MLPClassifier(hidden_layer_sizes='hidden_layer_sizes', 
+                        activation = 'activation',solver='solver',
+                        alpha='alpha',learning_rate='learning_rate',
+                        max_iter=1000)
+feature_selection= SelectFromModel(estimator=LinearSVC(C=0.1, penalty="l1", dual=False))
+ecoder='Label'
+pipe = pipeline(classifer,feature_selection,ecoder)
+
+parameter_space = {
+    'classifier__hidden_layer_sizes': [(50,50,50), (50,100,50), (10,100,10)],
+    'classifier__activation': ['tanh', 'relu'],
+    'classifier__solver': ['sgd', 'adam'],
+    'classifier__alpha': [0.05,0.001,0.0001,0.00001,0.00001],
+    'classifier__learning_rate': ['constant','adaptive'],
+}
+
+```
+!["Pipeline du modèle"](/assets/images/milestone2/pipeline.png.PNG)
+
 ### Conclusion
 Le KNN montre une forte sensibilité au déséquilibre des classes, se traduisant par une précision faible et un recall instable. Bien que l'accuracy et le ROC AUC soient relativement stables, ils ne suffisent pas à compenser les lacunes du modèle sur la classe minoritaire.
 En résumé, bien que le sous-échantillonnage ait aidé à équilibrer les données, KNN semble limité pour ce problème en raison de sa forte dépendance à la densité locale des données.
