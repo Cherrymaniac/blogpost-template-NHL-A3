@@ -7,7 +7,7 @@ categories: Blog IFT6758_A3
 Edward Habelrih, Michel Wilfred Essono et Rayan Yahiaoui
 # Suivi des Expériences
 
-Tout au long de ce milestone, nous avons utilisé Weights & Biases (Wandb) pour sauvegarder et suivre nos modèles à travers leurs différentes itérations, ce qui nous a permis de comparer les résultats au fil du temps. Cet outil s’est avéré extrêmement utile, offrant à l’équipe un moyen simple et interactif de surveiller les progrès. Pour chaque exécution, nous avons enregistré les figures pertinentes ainsi que les paramètres de configuration utilisés pour entraîner le modèle. De plus, les modèles ont été sauvegardés en tant qu’artifacts associés à leurs exécutions respectives.
+Tout au long de ce milestone, nous avons utilisé Weights & Biases (Wandb) pour sauvegarder et suivre nos modèles à travers leurs différentes itérations, ce qui nous a permis de comparer les résultats au fil du temps. Cet outil s’est avéré extrêmement utile, offrant à notre équipe un moyen simple et interactif de surveiller les progrès. Pour chaque exécution, nous avons enregistré les figures pertinentes ainsi que les paramètres de configuration utilisés pour entraîner le modèle. De plus, les modèles ont été sauvegardés en tant qu’artifacts associés à leurs exécutions respectives.
 
 Voici le lien vers notre espace de travail: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03
 # Ingénierie des Caractéristiques I
@@ -20,23 +20,25 @@ Nous avons généré deux histogrammes illustrant le nombre de tirs (buts et non
 ![Histogrammes des Tirs - Distance](/assets/images/milestone2/Nb_total_tirs_par_Distance.png)
 
 Voici les observations clés:
-  - Le nombre total de tirs diminue rapidement aux alentours de 60 mètres. 
-  - Plus la distance agumente, moins il est probable qu'un but soit marqué.
+  - Le nombre total de tirs diminue rapidement aux alentours de 50 mètres du but respectif. 
+  - Plus la distance agumente, moins il est probable qu'un but soit marqué. En effet, on remarque la plus grande concentration de buts entre 0 à 10 mètres du but.
   - Les tirs provenant de la moitié défensive de la patinoire sont extrêmement rares, et encore plus les buts.
-  - Les tirs effectués à très courte distance (<10m) ont une fréquence élevée, ce qui reflète une proximité stratégique pour maximiser les chances de marquer.
+  - Les tirs effectués à très courte distance (<10m) ont une fréquence élevée, ce qui reflète une proximité stratégique pour maximiser les chances de marquer. En effet, que le taux de buts vs tirs est le plus élevé à ces distances.
 
 
 ### Angle par Rapport au Filet
 
-Nous avons également produit deux histogrammes montrant la répartition des tirs selon leur angle relatif au filet.
+Nous avons également produit deux histogrammes montrant la répartition des tirs selon leur angle relatif au filet. Le schéma ci-dessous démontre la manière dont nos angles de tirs sont représentés pour les deux côtés de la patinoire. 
+
+![Angle Schema](/assets/images/milestone2/shot_angle_schema.png)
 
 ![Histogrammes des Tirs - Angle](/assets/images/milestone2/Distribution_Tirs_par_Angle(2016-2019).png)
 
 Voici les observations clés:
-- La majorité des tirs sont effectués directement face au filet ou à un angle modéré (environ ±30 degrés).
-- Les buts sont souvent marqués à des angles réduits (autour de 0 degré).
-- La fréquence des buts diminue significativement pour des angles au-delà de ±30 degrés.
-- Les angles extrêmes (±70 degrés ou plus) sont rares, et ils résultent rarement en buts, probablement en raison de la difficulté accrue de viser avec précision sous ces conditions. Le gardien a aussi moins de surface de but à couvrir pour empêcher la rondelle de rentrer plus l'angle du joueur adverse est accentué. 
+- La majorité des tirs sont effectués directement face au filet ou à un angle modéré (environ ±40 degrés).
+- Les buts sont souvent marqués à des angles réduits. À 0 degrés on remarque la plus grande quantité de buts et la tendance des buts suit une distribution normale. 
+- La fréquence des buts diminue significativement pour des angles au-delà de ±40 degrés.
+- Les observations de tirs à des angles extrêmes (±70 degrés ou plus) sont rares, et ils résultent rarement en buts. Ceci est probablement dû en raison de la difficulté accrue de viser avec précision sous ces conditions. Le gardien a aussi moins de surface de but à couvrir pour empêcher la rondelle de rentrer. 
 
 ### Diagramme de Dispersion 2D
 
@@ -51,9 +53,9 @@ Voici les observations clés:
   - Les tirs rapprochés du filet
   - Les tirs autour de 60m
   - Les angles proches de ±30 degrés
-- Les tirs sous des angles extrêmes (>±70 degrés) ne se produisent que dans des situations spécifiques et sont souvent liés à des filets vides ou à des tirs désespérés.
+- Les tirs sous des angles extrêmes (>±70 degrés) ne se produisent que dans des situations spécifiques et sont souvent liés à des tirs désespérés ou pour une tentative de déviation de tir.
 
-L’analyse des distances et des angles des tirs met en lumière l'importance stratégique de la proximité du filet et des angles favorables dans la probabilité de marquer. La plupart des tirs sont tentés à courte distance, dans les zones de haut danger situées devant le filet, et sous des angles réduits, ce qui reflète une approche axée sur l'efficacité et la pression offensive. Les tirs effectués à longue distance, souvent depuis la ligne bleue ou au-delà, ou sous des angles extrêmes près des bandes, sont beaucoup moins fréquents et rarement convertis en buts. Cependant, ces tirs lointains ou difficiles peuvent jouer un rôle tactique en générant des rebonds ou en profitant de filets vides lors de situations désespérées en fin de match.
+L’analyse des distances et des angles des tirs met en lumière l'importance stratégique de la proximité du filet et des angles favorables dans la probabilité de marquer. La plupart des tirs sont tentés à courte distance, dans les zones de haut danger situées devant le filet, et sous des angles réduits, ce qui reflète une approche axée sur l'efficacité et la pression offensive. Les tirs effectués à longue distance, souvent depuis la ligne bleue ou au-delà, ou sous des angles extrêmes près des bandes, sont beaucoup moins fréquents et rarement convertis en buts. Cependant, ces tirs lointains ou difficiles peuvent jouer un rôle tactique en générant des rebonds ou en profitant de filets vides lors de situations désespérées en fin de match. Les tirs provenant de loin peuvent également être le résultat d'un dégagement de l'équipe en désavantage numérique pour sortir la rondelle de leur zone. 
 
 ## 2.2 Taux de Buts par Distance et Angle
 
@@ -86,16 +88,16 @@ Pour les tirs sur un filet Non-Vide voici les observations clés:
 
 Pour les tirs sur un filet Vide voici les observatinos clés:
 - Les tirs sur filet vide peuvent être tentés depuis presque n'importe où sur la patinoire, y compris depuis la zone défensive ou les coins éloignés.
-- Ces situations résultent généralement de la décision de l'équipe adverse de retirer son gardien pour ajouter un attaquant supplémentaire en fin de match.
+- Ces situations résultent généralement de la décision de l'équipe adverse de retirer son gardien pour ajouter un attaquant supplémentaire en fin de match. Étant donné que l'équipe avec le filet vide bénéficie d'un joueur supplémentaire (non gardien) sur la glace, l'équipe adverse est contrainte de se débarrasser rapidement de la rondelle pour éviter de la perdre. Cela explique la répartition variée des buts provenant de différentes distances.  
 - Les tirs de longue distance (parfois supérieurs à 100 pieds) sont fréquents et réussis, en raison de l'absence de gardien pour défendre le filet.
 
 L’analyse montre des différences importantes entre les buts marqués sur filet vide et ceux sur filet non-vide. Les buts sur filet non-vide sont souvent dus à des tirs précis ou des actions rapprochées où le gardien est mis sous pression. En revanche, les filets vides permettent des tirs plus risqués et éloignés, souvent tentés depuis des positions inhabituelles. Ces résultats mettent en évidence l’influence des situations de jeu sur les opportunités de marquer et soulignent l’importance de traiter ces cas différemment dans l’analyse des buts attendus, pour mieux refléter les choix tactiques en fin de match.
 
-Nous avons procédé à une analyse approfondie des données pour détecter d’éventuelles anomalies. Pour cela, nous avons divisé la tâche entre les trois membres de l'équipe, chacun examinant 40 matchs pour un total de 120 matchs analysés. Durant cette analyse, nous avons vérifié attentivement les coordonnées (x, y), les types de tirs, et les autres caractéristiques associées aux événements.
+Nous avons mené une analyse approfondie des données pour identifier d’éventuelles anomalies. La tâche a été répartie équitablement entre les trois membres de notre équipe, chacun examinant 40 matchs, pour un total de 120 matchs analysés. Lors de cette vérification, nous avons minutieusement examiné les coordonnées (x, y), les types de tirs et les autres caractéristiques associées aux événements.
 
-De plus, nous avons utilisé le GameCenter de la LNH et des vidéos sur YouTube pour confirmer nos observations en visionnant les clips vidéo correspondants aux buts pour chaque match analysé. Cela nous a permis de valider que les événements enregistrés dans les données reflètent bien la réalité des situations de jeu.
+De plus, nous avons utilisé le GameCenter de la LNH ainsi que des vidéos sur YouTube pour valider nos observations en visionnant les clips vidéo des buts pour chaque match analysé. Cette approche nous a permis de confirmer que les événements enregistrés dans les données reflètent fidèlement les situations réelles sur la glace.
 
-Après cette analyse minutieuse, nous avons détecté une anomalie. En effet, James van Riemsdyk n'a pas marqué son but comme sous-entendent les coordonnées de l'API (dernière ligne de l'image). En effet en allant à 3:10 minutes de cette vidéo, du côté droit de la patinoire et non du côté gauche comme sous-entendu par la valeur de l'API. 
+Cependant, cette analyse nous a révélé une anomalie notable. Par exemple, les données de l'API suggèrent que James van Riemsdyk a marqué un but depuis le côté gauche de la patinoire, ce qui est incorrect. En visionnant la vidéo à 3:10 minutes, il est clairement visible que le but a été marqué depuis le côté droit de la patinoire, contredisant ainsi les coordonnées fournies par l’API. En effet, nous pouvons voir que les coordonnées de la patinoire pour son tir (dernière ligne de l'image ci-dessous) ne sont pas justes.
 
 ![Anomalie](/assets/images/milestone2/anomaly.png)
 
@@ -170,10 +172,7 @@ Commençons d'abord avec des caractéristiques de base.
 
 6. Angle du tir (Shot angle) :
   - **Colonne créée** : ```shotAngle```
-  - **Explication** : Angle du tir par rapport à la ligne centrale du filet, calculé dans ```calculate_shot_distance_and_angle()```. Le schéma ci-dessous démontre la manière dont nos angles de tirs sont représentés pour les deux côtés de la patinoire.
-
-  ![Angle Schema](/assets/images/milestone2/shot_angle_schema.png)
-
+  - **Explication** : Angle du tir par rapport à la ligne centrale du filet, calculé dans ```calculate_shot_distance_and_angle()```. 
   - **Code** :
     ```python
           def calculate_shot_distance_and_angle(self):
