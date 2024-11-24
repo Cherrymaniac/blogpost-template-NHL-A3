@@ -1063,15 +1063,17 @@ parameter_space = {
 
 ```
 !["Courbe ROC "](/assets/images/milestone2/ROC_MLP.png)
+La courbe ROC du modèle MLP montre une AUC de 0.762, ce qui indique que le modèle performe mieux qu'un classificateur aléatoire (AUC = 0.5) mais reste en deçà de certains autres modèles testés. Cela suggère que le modèle capture certaines relations non linéaires dans les données, mais que sa capacité prédictive pourrait être limitée par un surajustement ou un réglage insuffisant des hyperparamètres.
 
 !["Taux de buts"](/assets/images/milestone2/GR_MLP.png)
+Le graphique du taux de réussite montre que le modèle prédit des probabilités plus élevées pour les buts dans les percentiles supérieurs, mais ce taux diminue rapidement après le 20e percentile. Cela reflète une puissance prédictive modérée, le modèle ayant du mal à différencier efficacement les buts dans les percentiles moyens et inférieurs.
 
 !["Proportion cumulée de buts"](/assets/images/milestone2/CGR_MLP.png)
-
+Le graphique du pourcentage cumulatif de buts montre une accumulation progressive des buts à mesure que le percentile des probabilités diminue. Cela confirme que le modèle MLP classe correctement une grande partie des buts dans les percentiles élevés. Cependant, le rythme d'accumulation est plus lent comparé à des modèles plus optimisés, ce qui suggère une efficacité de classement sous-optimale.
 !["Diagramme de fiabilité"](/assets/images/milestone2/CC_MLP.png)
+La courbe de calibration montre que les probabilités prédites par le modèle MLP s'écartent de la ligne idéale diagonale, en particulier pour les probabilités prévues élevées. Le modèle a tendance à surestimer les probabilités dans les plages intermédiaires et à légèrement les sous-estimer aux extrêmes, ce qui indique un besoin d'amélioration dans la calibration.
 ### Conclusion
-
-
+En résumé, le MLP montre une performance modérée selon les différentes métriques, mais il ne dépasse pas les modèles XGBoost précédents. Des optimisations supplémentaires, notamment au niveau des hyperparamètres et de l'architecture, pourraient améliorer les résultats.
 
 
 # Évaluer sur l'ensemble de test
