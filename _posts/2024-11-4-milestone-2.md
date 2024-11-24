@@ -155,6 +155,7 @@ Le modèle ```Random``` reste constant, sans corrélation avec les résultats r�
 
 ![Le diagramme de fiabilité](/assets/images/milestone2/calibration_curve.png)
 
+Voici le lien vers notre modèle de base sur wandb:https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/80pxxjvs?nw=nwusermwessono
 
 
 # Ingénierie des Caractéristiques II
@@ -1069,6 +1070,8 @@ parameter_space = {
 !["Proportion cumulée de buts"](/assets/images/milestone2/CGR_MLP.png)
 
 !["Diagramme de fiabilité"](/assets/images/milestone2/CC_MLP.png)
+
+Voici le lien de notre meilleur modèle MLP:https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/zpt0bx5j?nw=nwusermwessono
 ### Conclusion
 
 
