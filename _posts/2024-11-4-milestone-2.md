@@ -1062,8 +1062,13 @@ parameter_space = {
 }
 
 ```
+!["Courbe ROC "](/assets/images/milestone2/ROC_MLP.png)
 
+!["Taux de buts"](/assets/images/milestone2/GR_MLP.png)
 
+!["Proportion cumulée de buts"](/assets/images/milestone2/CGR_MLP.png)
+
+!["Diagramme de fiabilité"](/assets/images/milestone2/CC_MLP.png)
 ### Conclusion
 
 
