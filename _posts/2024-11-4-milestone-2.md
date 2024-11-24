@@ -1072,14 +1072,15 @@ Le graphique du taux de réussite montre que le modèle prédit des probabilité
 !["Proportion cumulée de buts"](/assets/images/milestone2/CGR_MLP.png)
 Le graphique du pourcentage cumulatif de buts montre une accumulation progressive des buts à mesure que le percentile des probabilités diminue. Cela confirme que le modèle MLP classe correctement une grande partie des buts dans les percentiles élevés. Cependant, le rythme d'accumulation est plus lent comparé à des modèles plus optimisés, ce qui suggère une efficacité de classement sous-optimale.
 !["Diagramme de fiabilité"](/assets/images/milestone2/CC_MLP.png)
-<<<<<<< HEAD
 
-Voici le lien de notre meilleur modèle MLP:https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/zpt0bx5j?nw=nwusermwessono
-=======
+
 La courbe de calibration montre que les probabilités prédites par le modèle MLP s'écartent de la ligne idéale diagonale, en particulier pour les probabilités prévues élevées. Le modèle a tendance à surestimer les probabilités dans les plages intermédiaires et à légèrement les sous-estimer aux extrêmes, ce qui indique un besoin d'amélioration dans la calibration.
->>>>>>> e4a392c5bdd99f94083cca967b973d5287798123
+
+Voici le lien de notre meilleur modèle MLP: https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/zpt0bx5j?nw=nwusermwessono
+
 ### Conclusion
-En résumé, le MLP montre une performance modérée selon les différentes métriques, mais il ne dépasse pas les modèles XGBoost précédents. Des optimisations supplémentaires, notamment au niveau des hyperparamètres et de l'architecture, pourraient améliorer les résultats.
+
+En résumé, le modèle MLP a été choisi comme le meilleur car il offre une meilleure performance globale, avec une AUC de 0.762, surpassant les résultats obtenus avec le KNN et le Random Forest. Contrairement à ces derniers, le MLP capture mieux les relations complexes et non linéaires dans les données, ce qui en fait un modèle plus adapté pour cette tâche. De plus, les courbes de calibration et de taux de buts montrent une meilleure cohérence dans la prédiction des probabilités, renforçant la fiabilité du modèle. 
 
 
 # Évaluer sur l'ensemble de test
@@ -1133,3 +1134,18 @@ Les résultats pour les séries éliminatoires confirment une légère baisse de
 En conclusion, le modèle XGBoost avec SHAP reste le plus performant et robuste, suivi de près par logreg_comb et logreg_dist. Le MLP, bien qu'étant un modèle plus complexe, continue de décevoir en termes de généralisation, particulièrement dans des contextes comme les séries où les données peuvent être moins prévisibles.
 
 **Lien du run de test:** https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/kkfh7fyo?
+
+# Références
+
+1. https://www.google.com/search?q=nhl+api+documentation&oq=nhl+api+doc&gs_lcrp=EgRlZGdlKgwIABBFGDsYgAQY-QcyDAgAEEUYOxiABBj5BzIGCAEQRRg5MggIAhAAGBYYHjIICAMQABgWGB4yCAgEEAAYFhge0gEIMjYxNmowajSoAgCwAgA&sourceid=chrome&ie=UTF-8
+2. https://www.nhl.com/stats/
+3. https://www.ibm.com/topics/logistic-regression
+4. https://www.geeksforgeeks.org/understanding-logistic-regression/
+5. https://xgboost.readthedocs.io/en/stable/
+6. https://scikit-learn.org/1.5/modules/generated/sklearn.feature_selection.SelectKBest.html
+7. https://www.simplilearn.com/tutorials/statistics-tutorial/what-is-annova-test
+8. https://shap.readthedocs.io/en/latest/
+9. https://www.ibm.com/topics/random-forest#:~:text=Random%20forest%20is%20a%20commonly,both%20classification%20and%20regression%20problems.
+10. https://www.ibm.com/topics/knn#:~:text=The%20k%2Dnearest%20neighbors%20(KNN,used%20in%20machine%20learning%20today.
+11. https://www.geeksforgeeks.org/multi-layer-perceptron-learning-in-tensorflow/
+12. https://scikit-learn.org/1.5/auto_examples/model_selection/plot_roc_crossval.html
