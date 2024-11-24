@@ -655,8 +655,7 @@ Le code lié à cette section se retrouve dans ```advanced_models.py``` sous le 
 Pour compléter cette section, nous avons entraîné un classificateur XGBoost en utilisant uniquement les caractéristiques de ```distance``` et ```angle```. L'objectif de cette expérience était de comparer les performances de ce modèle avec la ligne de base établie dans la partie précédente à l'aide de la régression logistique. La configuration de l'entraînement a été réalisée avec une division 80/20 des données d'entraînement et de validation. Aucun réglage des hyperparamètres n'a été effectué à ce stade, le modèle XGBoost ayant été utilisé avec des paramètres par défaut. La configuration des paramètres par défaut peuvent tous être observés à ce lien:
 https://xgboost.readthedocs.io/en/stable/parameter.html
 
-**Liens vers le run:** https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/cdkbmot8?
-
+**Lien vers le run:** https://wandb.ai/michel-wilfred-essono-university-of-montreal/IFT6758.2024-A03/runs/gamngm0h?
 
 
 Voici les graphiques obtenus pour ce premier modèle:
@@ -1149,3 +1148,4 @@ En conclusion, le modèle XGBoost avec SHAP reste le plus performant et robuste,
 10. https://www.ibm.com/topics/knn#:~:text=The%20k%2Dnearest%20neighbors%20(KNN,used%20in%20machine%20learning%20today.
 11. https://www.geeksforgeeks.org/multi-layer-perceptron-learning-in-tensorflow/
 12. https://scikit-learn.org/1.5/auto_examples/model_selection/plot_roc_crossval.html
+13. https://github.com/dtreisman/BigDataCup2021
