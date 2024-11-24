@@ -106,53 +106,54 @@ Lien vers la vidéo: https://www.youtube.com/watch?v=liPQYJVSXpw&start=190
 Probablement que nous aurons trouvé d'autres situations similaires, mais cela demande une couverture d'analyse beaucoup plus grande! 
 
 # Modèles de base
-En utilisant uniquement la caractéristique distance pour évaluer notre modèle de base de regression logistique,on remarque que le modèle à parfaitement prédire les cas dans lesquels il n'y a pas de but.Mais pour les cas avec but, il échoue à systématiquement.Tel que le présente la figure ci-dessous.
+En utilisant uniquement la caractéristique distance pour évaluer notre modèle de base de regression logistique,on remarque que le modèle va parfaitement prédire les cas dans lesquels il n'y a pas de but.Mais pour les cas avec but, il échoue à systématiquement.Tel que le présente la figure ci-dessous.
 
 ![Matrice de confusion du modèle de regression logistique sur la caractéristique distance](/assets/images/milestone2/confusion_matrix_logreg_dist.png)
-La raison de cette disparité deans les performances du modèle pour prédire les deux est tout d'abord dû au déséquilibre dans la répartition des données des classes.En effet, tel que le montre la figure ci-dessous, le ratio entre les données de la classe 0 (no goal) et de la classe 1 (goal) est quasiment de 10 en faveur de classe 0. Cet état de fait entraine des biais dans le modèele lors de l'entrainement.
-La seconde raison est la fait d'utiliser une seule caractéristique pour entrainer le modèle.Car en utilisant une seule caractéristique,le modèle aura moins de matière pour aller chercher les informations sous-jacentes dans les données.
+La raison de cette disparité dans les performances du modèle pour prédire les deux est tout d'abord dû au déséquilibre dans la répartition des données des classes. En effet, tel que le montre la figure ci-dessous, le ratio entre les données de la classe 0 (no goal) et de la classe 1 (goal) est quasiment de 10 en faveur de classe 0. Cet état de fait entraîne des biais dans le modèle lors de l'entrainement.
+
+La seconde raison pour cette grande disparité réside dans le fait de l'utilisation d'une seule caractéristique pour entrainer le modèle. En utilisant une seule caractéristique,le modèle aura moins de matière pour aller chercher les informations sous-jacentes dans les données comme on va le voir dans les modèles des sections prochaines.
 
 ![Expression du déséquilibre des classes](/assets/images/milestone2/class_distribution.png)
 ## Courbes ROC (ROC Curves)
 
-Ce graphique évalue la capacité des modèles à distinguer entre tirs réussis et non réussis, basé sur le taux de vrais positifs (TPR) et le taux de faux positifs (FPR).
-Interprétation :
-Lorsque les caractéristiques Distance + Angle sont utilisées,le modèle montre de meilleures performances avec une AUC de 0.71, indiquant une bonne capacité de discrimination.
-Mais lorsque les caractéristiques Distance et Angle sont utilisées chacunes seules pour entrainer le modèle, on obtient des AUC de 0.69 et 0.56 respectivement, montrant une performance correcte mais inférieure.
-Le modèle random quant à lui a une AUC de 0.49, proche du hasard.
+Ce graphique évalue la capacité des modèles à distinguer entre les tirs réussis et non réussis, basé sur le taux de vrais positifs (TPR) et le taux de faux positifs (FPR).
+
+**Interprétation** :
+Lorsque les caractéristiques ```Distance``` et ```Angle``` sont utilisées ensemble, le modèle montre de meilleures performances avec une AUC de 0.71, indiquant une bonne capacité de discrimination.
+Cependant, lorsque les caractéristiques ```Distance``` et ```Angle``` sont utilisées chacunes seules pour entrainer le modèle, on obtient des AUC de 0.69 et 0.56 respectivement. Ceci démontre une performance correcte mais tout de fois inférieure.
+Le modèle aléatoire quant à lui a une AUC de 0.49, qui est exactement proche du hasard ou même d'un "coin flip".
 
 ![La courbe ROC](/assets/images/milestone2/roc_curve.png)
 ## Taux de Buts (Goal Rate)
 
-Description :
-Ce graphique montre la proportion de buts marqués (goals/(shots + goals)) en fonction des percentiles.
-Interprétation :
-Les modèles Distance et Distance + Angle prédisent des proportions de but marqués quasiment similaires peu importe le percentile.Le modèle entrainé uniquement sur la caractéristique angle prédit des proportions de but marqués inférieurs au deux modèles précédent environ à partir du 55 ième percentile.
-Étant donné que 10% des tirs sont des buts, on s'attend donc à ce qu'un bon modèle puisse donner une probabilité élevée de but à partir environ du 90 ième percentile.
-De cela on peut donc conclure que les modèles Distance et Distance + Angle sont meilleurs que le modèle Angle.
+Ce graphique montre la proportion de buts marqués (goals/(shots + goals)) en fonction des centiles.
+
+**Interprétation** :
+Les modèles ```Distance``` et ```Distance``` + ```Angle``` prédisent des proportions de but marqués quasiment similaires peu importe le centile. Le modèle entrainé uniquement sur la caractéristique ```angle``` prédit des proportions de but marqués inférieurs aux deux modèles précédents environ à partir du 55ème centile.
+Étant donné que 10% des tirs sont des buts, on s'attend donc à ce qu'un bon modèle puisse donner une probabilité élevée de but à partir environ du 90ème centile.
+Avec cela, on peut donc conclure que les modèles ```Distance``` et ```Distance``` + ```Angle``` sont meilleurs que le modèle simplement ```Angle```.
 
 ![Le taux de buts](/assets/images/milestone2/goal_rate_plot.png)
 ## Pourcentage Cumulatif de Buts (Cumulative % of Goal)
-Description :
-Ce graphique montre la proportion cumulée de buts en fonction des percentiles de probabilité.
-Interprétation :
-Le modèle Distance + Angle capture les buts les plus probables plus efficacement (courbe plus proche de 1 en premier).
-Les modèles Distance et Angle suivent de près, tandis que le modèle Random est linéaire (aucune distinction entre les probabilités).
-Cela indique que Distance + Angle est plus performant pour identifier les tirs les plus susceptibles de marquer.
+
+Ce graphique montre la proportion cumulée de buts en fonction des centiles de probabilité.
+
+**Interprétation** :
+Le modèle ```Distance``` + ```Angle``` capture les buts les plus probables plus efficacement (courbe plus proche de 1 en premier).
+Les modèles ```Distance``` et ```Angle``` suivent de près, tandis que le modèle ```Random``` est linéaire (aucune distinction entre les probabilités).
+Cela indique que ```Distance``` + ```Angle``` est plus performant pour identifier les tirs les plus susceptibles de rentrer dans le filet.
 
 ![La proportion cumulée de buts](/assets/images/milestone2/cum_rate_plot.png)
 ## Courbe de Calibration (Calibration Curve)
-Description :
+
 Cette courbe montre la calibration des modèles. Une courbe parfaitement calibrée suit la ligne pointillée (idéale).
-Interprétation :
-Le modèle Distance + Angle semble mieux calibré dans les premiers percentiles, ce qui signifie que ses probabilités prédites correspondent mieux à la proportion observée de buts.
-Les modèles basés uniquement sur Distance ou Angle semblent moins bien calibrés, avec une sous-évaluation ou surévaluation selon le percentile.
-Le modèle Random reste constant, sans corrélation avec les résultats réels.
+
+**Interprétation** :
+Le modèle ```Distance``` + ```Angle ``` semble mieux calibré dans les premiers centiles, ce qui signifie que ses probabilités prédites correspondent mieux à la proportion observée de buts.
+Les modèles basés uniquement sur ```Distance``` ou ```Angle``` semblent moins bien calibrés, avec une sous-évaluation ou surévaluation selon le centile.
+Le modèle ```Random``` reste constant, sans corrélation avec les résultats réels.
 
 ![Le diagramme de fiabilité](/assets/images/milestone2/calibration_curve.png)
-
-
-
 
 
 
